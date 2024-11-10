@@ -1,4 +1,5 @@
 package avto.accord.Interfaces;
+
 import avto.accord.App.Domain.Models.Category.Category;
 import avto.accord.App.Domain.Models.Price.Price;
 import avto.accord.App.Domain.Models.Price.PriceRequest;
@@ -16,16 +17,22 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -45,17 +52,68 @@ public class ProductControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    @Test
+    public void testGetAllProducts() throws Exception {
+        int offset = 0;
+        int limit = 10;
+        try {
+            List<Product> products = Arrays.asList(
+                    new Product(1, "Engine Oil", "Castrol", 50, "liters", "High-quality engine oil", "E12345", "path/to/mainPhoto1.jpg", Arrays.asList("path/to/additionalPhoto1.jpg"),
+                            new Category(1), new Price(100, 5), Arrays.asList(
+                            new ProductProperty(1, new Product(1, "Engine Oil", "Castrol", 50, "liters", "High-quality engine oil", "E12345", "path/to/mainPhoto1.jpg", Arrays.asList("path/to/additionalPhoto1.jpg"),
+                                    new Category(1),
+                                    new Price(100, 5), Arrays.asList()), new Property(1, "Viscosity", null), "5W-30"))),
+                    new Product(2, "Brake Pads", "Bosch", 100, "units", "High-performance brake pads", "B67890", "path/to/mainPhoto2.jpg", Arrays.asList("path/to/additionalPhoto2.jpg"),
+                            new Category(2),
+                            new Price(200, 10), Arrays.asList(
+                            new ProductProperty(2,
+                                    new Product(2, "Brake Pads", "Bosch", 100, "units", "High-performance brake pads", "B67890", "path/to/mainPhoto2.jpg", Arrays.asList("path/to/additionalPhoto2.jpg"),
+                                            new Category(2), new Price(200, 10), Arrays.asList()),
+                                    new Property(2, "Material", null), "Ceramic")))
+            );
+            Page<Product> productPage = new PageImpl<>(products, PageRequest.of(offset, limit), products.size());
+
+            when(productService.getAllProducts(anyInt(), anyInt())).thenReturn(productPage);
+            mockMvc.perform(get("/products")
+                            .param("offset", String.valueOf(offset))
+                            .param("limit", String.valueOf(limit))
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(content().json(objectMapper.writeValueAsString(productPage)));
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Test
+    public void testGetProductById() throws Exception {
+        int productId = 1;
+        Product expectedProduct = new Product(1, "Product 1", "Brand 1", 10, "units", "Description 1", "12345", "path/to/mainPhoto1.jpg", Arrays.asList("path/to/additionalPhoto1.jpg"),
+                new Category(1), new Price(100, 10),
+                Arrays.asList(
+                        new ProductProperty(
+                                1, new Product(1, "Engine Oil", "Castrol", 50, "liters", "High-quality engine oil", "E12345", "path/to/mainPhoto1.jpg", Arrays.asList("path/to/additionalPhoto1.jpg"),
+                                new Category(1), new Price(100, 5), Arrays.asList()),
+                                new Property(1, "Viscosity", null), "5W-30")));
+
+        when(productService.getProductById(anyInt())).thenReturn(expectedProduct);
+
+        mockMvc.perform(get("/products/{id}", productId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedProduct)));
+    }
+
 
     @Test
     public void testCreateProduct() throws Exception {
-        // Создание запроса
         ProductRequest productRequest = new ProductRequest();
-        productRequest.setName("Test Product");
-        productRequest.setBrand("Test Brand");
-        productRequest.setCount(10);
-        productRequest.setCountType("units");
-        productRequest.setDescription("This is a test product.");
-        productRequest.setArticle("12345");
+        productRequest.setName("Engine Oil");
+        productRequest.setBrand("Castrol");
+        productRequest.setCount(50);
+        productRequest.setCountType("liters");
+        productRequest.setDescription("High-quality engine oil");
+        productRequest.setArticle("E12345");
         productRequest.setCategoryId(1);
 
         // Создание мок-файлов для фотографий
@@ -68,41 +126,40 @@ public class ProductControllerTest {
 
         // Создание мок-объекта для цены
         PriceRequest priceRequest = new PriceRequest();
-        priceRequest.setDiscount(10);
+        priceRequest.setDiscount(5);
         priceRequest.setValue(100);
         productRequest.setPrice(priceRequest);
 
         // Создание мок-объекта для свойств
         ProductPropertyRequest propertyRequest1 = new ProductPropertyRequest();
         propertyRequest1.setPropertyId(1);
-        propertyRequest1.setValue("Property Value 1");
+        propertyRequest1.setValue("5W-30");
 
         ProductPropertyRequest propertyRequest2 = new ProductPropertyRequest();
         propertyRequest2.setPropertyId(2);
-        propertyRequest2.setValue("Property Value 2");
+        propertyRequest2.setValue("High-quality");
 
         productRequest.setProperties(Arrays.asList(propertyRequest1, propertyRequest2));
 
-        // Создание ожидаемого объекта Product
         Product expectedProduct = new Product();
-        expectedProduct.setName("Test Product");
-        expectedProduct.setBrand("Test Brand");
-        expectedProduct.setCount(10);
-        expectedProduct.setCountType("units");
-        expectedProduct.setDescription("This is a test product.");
-        expectedProduct.setArticle("12345");
+        expectedProduct.setName("Engine Oil");
+        expectedProduct.setBrand("Castrol");
+        expectedProduct.setCount(50);
+        expectedProduct.setCountType("liters");
+        expectedProduct.setDescription("High-quality engine oil");
+        expectedProduct.setArticle("E12345");
         expectedProduct.setMainPhotoUrl("path/to/mainPhoto.jpg");
         expectedProduct.setAdditionalPhotos(Arrays.asList("path/to/additionalPhoto1.jpg", "path/to/additionalPhoto2.jpg"));
         Category category = new Category();
         category.setId(1);
         expectedProduct.setCategory(category);
         Price price = new Price();
-        price.setDiscount(10);
+        price.setDiscount(5);
         price.setValue(100);
         expectedProduct.setPrice(price);
         List<ProductProperty> properties = Arrays.asList(
-                new ProductProperty(1, expectedProduct, new Property(1, "Property 1", null), "Property Value 1"),
-                new ProductProperty(2, expectedProduct, new Property(2, "Property 2", null), "Property Value 2")
+                new ProductProperty(1, expectedProduct, new Property(1, "Viscosity", null), "5W-30"),
+                new ProductProperty(2, expectedProduct, new Property(2, "Quality", null), "High-quality")
         );
         expectedProduct.setProperties(properties);
 
@@ -114,21 +171,83 @@ public class ProductControllerTest {
                         .file(mainPhoto)
                         .file(additionalPhoto1)
                         .file(additionalPhoto2)
-                        .param("name", "Test Product")
-                        .param("brand", "Test Brand")
-                        .param("count", "10")
-                        .param("countType", "units")
-                        .param("description", "This is a test product.")
-                        .param("article", "12345")
+                        .param("name", "Engine Oil")
+                        .param("brand", "Castrol")
+                        .param("count", "50")
+                        .param("countType", "liters")
+                        .param("description", "High-quality engine oil")
+                        .param("article", "E12345")
                         .param("categoryId", "1")
-                        .param("price.discount", "10")
+                        .param("price.discount", "5")
                         .param("price.value", "100")
                         .param("properties[0].propertyId", "1")
-                        .param("properties[0].value", "Property Value 1")
+                        .param("properties[0].value", "5W-30")
                         .param("properties[1].propertyId", "2")
-                        .param("properties[1].value", "Property Value 2")
+                        .param("properties[1].value", "High-quality")
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(expectedProduct)));
+    }
+
+    @Test
+    public void testUpdatePrice() throws Exception {
+        int productId = 1;
+        int newPrice = 150;
+        Product expectedProduct = new Product();
+        expectedProduct.setId(productId);
+        expectedProduct.setPrice(new Price(newPrice, 10));
+
+        when(productService.updatePrice(anyInt(), anyInt())).thenReturn(expectedProduct);
+
+        mockMvc.perform(put("/products/{id}/price", productId)
+                        .param("newPrice", String.valueOf(newPrice))
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedProduct)));
+    }
+
+    @Test
+    public void testUpdateDiscount() throws Exception {
+        int productId = 1;
+        int newDiscount = 20;
+        Product expectedProduct = new Product();
+        expectedProduct.setId(productId);
+        expectedProduct.setPrice(new Price(100, newDiscount));
+
+        when(productService.updateDiscount(anyInt(), anyInt())).thenReturn(expectedProduct);
+
+        mockMvc.perform(put("/products/{id}/discount", productId)
+                        .param("newDiscount", String.valueOf(newDiscount))
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedProduct)));
+    }
+
+    @Test
+    public void testUpdateCount() throws Exception {
+        int productId = 1;
+        int newCount = 20;
+        Product expectedProduct = new Product();
+        expectedProduct.setId(productId);
+        expectedProduct.setCount(newCount);
+
+        when(productService.updateCount(anyInt(), anyInt())).thenReturn(expectedProduct);
+
+        mockMvc.perform(put("/products/{id}/count", productId)
+                        .param("newCount", String.valueOf(newCount))
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(expectedProduct)));
+    }
+
+    @Test
+    public void testDeleteProduct() throws Exception {
+        int productId = 1;
+
+        doNothing().when(productService).deleteProduct(anyInt());
+
+        mockMvc.perform(delete("/products/{id}", productId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 }

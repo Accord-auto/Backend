@@ -20,6 +20,13 @@ public class PropertyService {
             throw e;
         }
     }
+    public Property getPropertyById(int id) {
+        try {
+            return _propertyRepository.findById(id).orElse(null);
+        }catch (Exception e){
+            throw e;
+        }
+    }
 
     public void delete(int id) {
         _propertyRepository.deleteById(id);

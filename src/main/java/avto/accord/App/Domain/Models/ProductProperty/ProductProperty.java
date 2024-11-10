@@ -23,4 +23,5 @@ public class ProductProperty {
     @JoinColumn(name = "property_id", referencedColumnName = "id")
     private Property property;
     private String value;
+
 }

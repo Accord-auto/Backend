@@ -18,4 +18,9 @@ public class Price {
     private Product product;
     private int value;
     private int discount;
+
+    public Price(int value, int discount) {
+        this.value = value;
+        this.discount = discount;
+    }
 }

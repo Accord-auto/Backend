@@ -23,6 +23,7 @@ public class PhotoService {
 
     public void savePhoto(String photoPath, byte[] photoData) throws IOException {
         Path path = Paths.get(photoStoragePath, photoPath);
+        Files.createDirectories(path.getParent());
         Files.write(path, photoData);
     }
 

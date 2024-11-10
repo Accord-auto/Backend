@@ -8,6 +8,10 @@ import java.io.IOException;
 
 public interface IProductService {
     Page<Product> getAllProducts(int offset, int limit);
-    Product getProduct(int id);
-    Product saveProduct(ProductRequest product) throws IOException;
+    Product getProductById(int productId);
+    Product saveProduct(ProductRequest productRequest) throws IOException;
+    void deleteProduct(int productId);
+    Product updatePrice(int productId, int newPrice);
+    Product updateDiscount(int productId, int newDiscount);
+    Product updateCount(int productId, int newCount);
 }
