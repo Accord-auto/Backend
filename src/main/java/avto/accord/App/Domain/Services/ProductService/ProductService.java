@@ -42,6 +42,7 @@ public class ProductService implements IProductService {
     public Page<Product> getAllProducts(int offset, int limit) {
         return _productRepository.findAll(PageRequest.of(offset, limit));
     }
+
     @Override
     public Product getProductById(int productId) {
         return _productRepository.findById(productId)
@@ -49,18 +50,26 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    @Transactional
     public Product saveProduct(ProductRequest productRequest) throws IOException {
-        Product product = _productFactory.createProduct(productRequest);
-        return _productRepository.save(product);
+        try {
+            Product product = _productFactory.createProduct(productRequest);
+            return _productRepository.save(product);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     @Transactional
-    public void deleteProduct(int productId) {
-        Product product = getProductById(productId);
-        _productRepository.delete(product);
+    public boolean deleteProduct(int id) {
+        Optional<Product> productOptional = _productRepository.findById(id);
+        if (productOptional.isPresent()) {
+            _productRepository.delete(productOptional.get());
+            return true;
+        }
+        return false;
     }
+
 
     @Override
     @Transactional

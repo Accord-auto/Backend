@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -35,27 +38,48 @@ public class ProductController {
         return productService.getProductById(id);
     }
 
-    @PostMapping(consumes = {"multipart/form-data"})
-    public Product createProduct(@ModelAttribute ProductRequest productRequest) throws IOException {
-        return productService.saveProduct(productRequest);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Product> createProduct(@ModelAttribute ProductRequest productRequest) throws IOException {
+        Product createdProduct = productService.saveProduct(productRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
     @PutMapping("/{id}/price")
-    public Product updatePrice(@PathVariable int id, @RequestParam int newPrice) {
-        return productService.updatePrice(id, newPrice);
+    public ResponseEntity<Product> updateProductPrice(@PathVariable int id, @RequestBody int price) {
+        Product updatedProduct = productService.updatePrice(id, price);
+        if (updatedProduct != null) {
+            return ResponseEntity.ok(updatedProduct);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @PutMapping("/{id}/discount")
-    public Product updateDiscount(@PathVariable int id, @RequestParam int newDiscount) {
-        return productService.updateDiscount(id, newDiscount);
+    public ResponseEntity<Product> updateProductDiscount(@PathVariable int id, @RequestBody int discount) {
+        Product updatedProduct = productService.updateDiscount(id, discount);
+        if (updatedProduct != null) {
+            return ResponseEntity.ok(updatedProduct);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
-    @PutMapping("/{id}/count")
-    public Product updateCount(@PathVariable int id, @RequestParam int newCount) {
-        return productService.updateCount(id, newCount);
+    @PutMapping(value = "/{id}/count", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Product> updateProductCount(@PathVariable int id, @RequestBody int newCount) {
+        Product updatedProduct = productService.updateCount(id, newCount);
+        if (updatedProduct != null) {
+            return ResponseEntity.ok(updatedProduct);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @DeleteMapping("/{id}")
-    public void deleteProduct(@PathVariable int id) {
-        productService.deleteProduct(id);
+    public ResponseEntity<Void> deleteProduct(@PathVariable int id) {
+        boolean deleted = productService.deleteProduct(id);
+        if (deleted) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 }

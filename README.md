@@ -54,6 +54,7 @@ cd Backend
 
 ## Использование
 После запуска приложения, вы можете взаимодействовать с API через следующие эндпоинты:
+
 ### Products Endpoints
 *   GET /products: Получить список всех товаров с пагинацией
 *   GET /products/{id}: Получить информацию о товаре по идентификатору
@@ -62,6 +63,81 @@ cd Backend
 *   PUT /products/{id}/discount: Обновить скидку на товар
 *   PUT /products/{id}/count: Обновить количество товара
 *   DELETE /products/{id}: Удалить товар
+
+### Properties Endpoints
+*   POST /properties: Создать новую характеристику
+*   DELETE /properties/{id}: Удалить характеристику по идентификатору
+
+### Categories Endpoints
+*   GET /categories: Получить список всех категорий
+*   POST /categories: Создать новую категорию
+*   DELETE /categories/{id}: Удалить категорию по идентификатору
+
+### Articles Endpoints
+
+```plaintext
+ GET /articles: Получить список всех статей
+```
+```json
+[
+  {
+    "id": 0,
+    "name": "string",
+    "brand": "string",
+    "count": 0,
+    "price": {
+      "id": 0,
+      "product": "string",
+      "value": 0,
+      "discount": 0
+    },
+    "countType": "string",
+    "description": "string",
+    "article": "string",
+    "category": {
+      "name": "string",
+      "products": [
+        "string"
+      ],
+      "id": 0
+    },
+    "mainPhotoUrl": "string",
+    "additionalPhotos": [
+      "string"
+    ],
+    "properties": [
+      {
+        "id": 0,
+        "product": "string",
+        "property": {
+          "name": "string",
+          "productProperties": [
+            "string"
+          ],
+          "id": 0
+        },
+        "value": "string"
+      }
+    ]
+  }
+]
+ 
+```
+```plaintext
+GET /articles/{id}: Получить информацию о статье по идентификатору
+```
+```plaintext
+POST /articles: Создать новую статью
+```
+```plaintext
+PUT /articles/{id}: Обновить статью по идентификатору
+```
+```plaintext
+DELETE /articles/{id}: Удалить статью по идентификатору
+```
+### Photos Endpoints
+*   GET /photos/{photoPath}: Получить фотографию по пути
+*   GET /photos/batch: Получить несколько фотографий по списку путей
 
 ## Тестирование
 Для запуска тестов используйте:

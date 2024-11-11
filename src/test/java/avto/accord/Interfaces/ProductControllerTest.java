@@ -23,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Arrays;
 import java.util.List;
@@ -185,46 +186,46 @@ public class ProductControllerTest {
                         .param("properties[1].propertyId", "2")
                         .param("properties[1].value", "High-quality")
                         .contentType(MediaType.MULTIPART_FORM_DATA))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().json(objectMapper.writeValueAsString(expectedProduct)));
     }
 
     @Test
-    public void testUpdatePrice() throws Exception {
+    public void testUpdateProductPrice() throws Exception {
         int productId = 1;
-        int newPrice = 150;
+        int newPrice = 200;
         Product expectedProduct = new Product();
         expectedProduct.setId(productId);
-        expectedProduct.setPrice(new Price(newPrice, 10));
+        expectedProduct.setPrice(new Price(newPrice, 0));
 
         when(productService.updatePrice(anyInt(), anyInt())).thenReturn(expectedProduct);
 
-        mockMvc.perform(put("/products/{id}/price", productId)
-                        .param("newPrice", String.valueOf(newPrice))
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+        mockMvc.perform(MockMvcRequestBuilders.put("/products/{id}/price", productId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newPrice)))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(expectedProduct)));
     }
 
     @Test
-    public void testUpdateDiscount() throws Exception {
+    public void testUpdateProductDiscount() throws Exception {
         int productId = 1;
         int newDiscount = 20;
         Product expectedProduct = new Product();
         expectedProduct.setId(productId);
-        expectedProduct.setPrice(new Price(100, newDiscount));
+        expectedProduct.setPrice(new Price(0, newDiscount));
 
         when(productService.updateDiscount(anyInt(), anyInt())).thenReturn(expectedProduct);
 
-        mockMvc.perform(put("/products/{id}/discount", productId)
-                        .param("newDiscount", String.valueOf(newDiscount))
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+        mockMvc.perform(MockMvcRequestBuilders.put("/products/{id}/discount", productId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newDiscount)))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(expectedProduct)));
     }
 
     @Test
-    public void testUpdateCount() throws Exception {
+    public void testUpdateProductCount() throws Exception {
         int productId = 1;
         int newCount = 20;
         Product expectedProduct = new Product();
@@ -233,9 +234,9 @@ public class ProductControllerTest {
 
         when(productService.updateCount(anyInt(), anyInt())).thenReturn(expectedProduct);
 
-        mockMvc.perform(put("/products/{id}/count", productId)
-                        .param("newCount", String.valueOf(newCount))
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+        mockMvc.perform(MockMvcRequestBuilders.put("/products/{id}/count", productId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newCount)))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(expectedProduct)));
     }
@@ -244,10 +245,10 @@ public class ProductControllerTest {
     public void testDeleteProduct() throws Exception {
         int productId = 1;
 
-        doNothing().when(productService).deleteProduct(anyInt());
+        when(productService.deleteProduct(anyInt())).thenReturn(true);
 
-        mockMvc.perform(delete("/products/{id}", productId)
+        mockMvc.perform(MockMvcRequestBuilders.delete("/products/{id}", productId)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 }
