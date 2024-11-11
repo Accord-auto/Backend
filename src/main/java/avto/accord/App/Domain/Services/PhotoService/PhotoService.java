@@ -30,14 +30,13 @@ public class PhotoService {
     public byte[] getPhoto(String photoPath) throws IOException {
         return photoStorageStrategy.getPhoto(photoPath);
     }
-    @Async
-    public CompletableFuture<List<byte[]>> getPhotosAsync(List<String> photoPaths) {
-        return CompletableFuture.supplyAsync(() -> photoPaths.stream()
+
+    public List<byte[]> getPhotos(List<String> photoPaths) {
+        return photoPaths.stream()
                 .map(this::getPhotoWrapper)
                 .flatMap(Optional::stream)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
     }
-
     private Optional<byte[]> getPhotoWrapper(String photoPath) {
         try {
             return Optional.of(getPhoto(photoPath));
