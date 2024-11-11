@@ -33,16 +33,18 @@ public class ProductController {
     ) {
         return productService.getAllProducts(offset, limit);
     }
+
     @GetMapping("/{id}")
     public Product getProduct(@PathVariable int id) {
         return productService.getProductById(id);
     }
 
+    //TODO: пофиксить
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Product> createProduct(@ModelAttribute ProductRequest productRequest) throws IOException {
-        Product createdProduct = productService.saveProduct(productRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
+    public Product createProduct(@ModelAttribute ProductRequest productRequest) throws IOException {
+        return productService.saveProduct(productRequest);
     }
+
     @PutMapping("/{id}/price")
     public ResponseEntity<Product> updateProductPrice(@PathVariable int id, @RequestBody int price) {
         Product updatedProduct = productService.updatePrice(id, price);
