@@ -41,7 +41,7 @@ public class CategoryService implements ICategoryService {
     public void deleteCategory(int id) {
         _categoryRepository.deleteById(id);
     }
-    public Optional<Category> getCategoryById(int id) {
-        return _categoryRepository.findById(id);
+    public Category getCategoryById(int id) {
+        return _categoryRepository.findById(id).get();
     }
 }

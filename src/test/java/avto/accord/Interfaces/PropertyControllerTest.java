@@ -2,6 +2,7 @@ package avto.accord.Interfaces;
 
 import avto.accord.App.Domain.Models.Property.Property;
 import avto.accord.App.Domain.Models.Property.PropertyRequest;
+import avto.accord.App.Domain.Services.PhotoService.PhotoStorage;
 import avto.accord.App.Domain.Services.PropertyService.PropertyService;
 import avto.accord.App.Web.Controllers.PropertyController.PropertyController;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -25,6 +26,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class PropertyControllerTest {
     @Autowired
     private MockMvc mockMvc;
+    @MockBean
+    private PhotoStorage photoStorage;
 
     @MockBean
     private PropertyService propertyService;
@@ -33,29 +36,31 @@ public class PropertyControllerTest {
 
     @BeforeEach
     public void setUp() {
+        objectMapper = new ObjectMapper();
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
     public void testAddProperty() throws Exception {
-        PropertyRequest request = new PropertyRequest();
-        request.setName("New Property");
-        Property property = new Property(1, "New Property", null);
+        PropertyRequest propertyRequest = new PropertyRequest();
+        propertyRequest.setName("Test Property");
+        Property createdProperty = new Property();
+        createdProperty.setId(1);
+        createdProperty.setName("Test Property");
 
-        when(propertyService.save(any(PropertyRequest.class))).thenReturn(property);
+        when(propertyService.saveProperty(any(PropertyRequest.class))).thenReturn(createdProperty);
 
         mockMvc.perform(post("/properties")
-                        .content(objectMapper.writeValueAsString(request))
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(propertyRequest)))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(property)));
+                .andExpect(content().json(objectMapper.writeValueAsString(createdProperty)));
     }
-
     @Test
     public void testDeleteProperty() throws Exception {
         int propertyId = 1;
 
-        doNothing().when(propertyService).delete(propertyId);
+        doNothing().when(propertyService).deleteProperty(propertyId);
 
         mockMvc.perform(delete("/properties/{id}", propertyId))
                 .andExpect(status().isOk());

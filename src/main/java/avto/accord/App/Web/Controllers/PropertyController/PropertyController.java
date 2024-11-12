@@ -20,10 +20,10 @@ public class PropertyController {
 
     @PostMapping
     public Property addProperty(@RequestBody PropertyRequest request) {
-        return _propertyService.save(request);
+        return _propertyService.saveProperty(request);
     }
     @DeleteMapping("/{id}")
     public void deleteProperty(@PathVariable int id) {
-        _propertyService.delete(id);
+        _propertyService.deleteProperty(id);
     }
 }

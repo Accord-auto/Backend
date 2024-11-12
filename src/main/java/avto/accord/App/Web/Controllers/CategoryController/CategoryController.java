@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,16 +21,19 @@ import java.util.List;
 public class CategoryController {
     @Autowired
     private CategoryService _categoryService;
-    @GetMapping("/")
-    public List<Category> getAllCategories() {
-        return _categoryService.getAllCategories();
+    @GetMapping
+    public ResponseEntity<List<Category>> getAllCategories() {
+        return ResponseEntity.ok(_categoryService.getAllCategories());
     }
-    @PostMapping("/")
-    public Category addCategory(@RequestBody CategoryRequest request) {
-        return _categoryService.saveCategory(request);
+    @PostMapping
+    public ResponseEntity<Category> addCategory(@RequestBody CategoryRequest request) {
+        Category category = _categoryService.saveCategory(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(category);
     }
     @DeleteMapping("/{id}")
-    public void deleteCategory(@PathVariable int id) {
+    public ResponseEntity<Void> deleteCategory(@PathVariable int id) {
+        log.info("запрос на удаление категории по id: ", id);
         _categoryService.deleteCategory(id);
+        return ResponseEntity.noContent().build();
     }
 }

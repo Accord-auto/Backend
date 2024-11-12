@@ -1,48 +1,43 @@
 package avto.accord.App.Domain.Services.PhotoService;
 
+import avto.accord.App.Domain.Models.FileInfo.FileInfo;
+import avto.accord.App.Web.Controllers.PhotoContoller.PhotoController;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PhotoService {
-    private final PhotoStorageStrategy photoStorageStrategy;
+    @Autowired
+    private PhotoStorage photoStorage;
 
-    public void savePhoto(String photoPath, byte[] photoData) throws IOException {
-        photoStorageStrategy.savePhoto(photoPath, photoData);
+    public void savePhoto(MultipartFile file) {
+        photoStorage.savePhoto(file);
     }
-    @Cacheable(value = "photos", key = "#photoPath")
-    public byte[] getPhoto(String photoPath) throws IOException {
-        return photoStorageStrategy.getPhoto(photoPath);
+    @Cacheable(value = "photos", key = "#photoname")
+    public Resource getPhoto(String photoname) throws IOException {
+        return photoStorage.loadPhoto(photoname);
     }
 
-    public List<byte[]> getPhotos(List<String> photoPaths) {
-        return photoPaths.stream()
-                .map(this::getPhotoWrapper)
-                .flatMap(Optional::stream)
-                .collect(Collectors.toList());
-    }
-    private Optional<byte[]> getPhotoWrapper(String photoPath) {
-        try {
-            return Optional.of(getPhoto(photoPath));
-        } catch (IOException e) {
-            log.error("Error reading photo: {}", photoPath, e);
-            return Optional.empty();
-        }
+    public List<FileInfo> getPhotos() {
+        return photoStorage.loadAllPhotos().map(path -> {
+            String photoName = path.getFileName().toString();
+            String url = MvcUriComponentsBuilder
+                    .fromMethodName(PhotoController.class, "getPhoto", path.getFileName().toString()).build().toString();
+
+            return new FileInfo(photoName, url);
+        }).collect(Collectors.toList());
     }
 }

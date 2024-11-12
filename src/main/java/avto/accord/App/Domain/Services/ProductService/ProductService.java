@@ -1,5 +1,6 @@
 package avto.accord.App.Domain.Services.ProductService;
 
+import avto.accord.App.Application.Factory.IProductFactory;
 import avto.accord.App.Application.Services.IProductService;
 import avto.accord.App.Domain.Factory.ProductFactory;
 import avto.accord.App.Domain.Models.Category.Category;
@@ -36,7 +37,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProductService implements IProductService {
     private final ProductRepository _productRepository;
-    private final ProductFactory _productFactory;
+    private final IProductFactory _productFactory;
 
     @Override
     public Page<Product> getAllProducts(int offset, int limit) {
@@ -58,7 +59,9 @@ public class ProductService implements IProductService {
             throw new RuntimeException(e);
         }
     }
-
+    public Product saveProduct(Product product) {
+        return _productRepository.save(product);
+    }
     @Override
     @Transactional
     public boolean deleteProduct(int id) {
@@ -93,5 +96,15 @@ public class ProductService implements IProductService {
         Product product = getProductById(productId);
         product.setCount(newCount);
         return _productRepository.save(product);
+    }
+    @Override
+    public Product updateCustomerArticle(int id, String customerArticle) {
+        Optional<Product> optionalProduct = _productRepository.findById(id);
+        if (optionalProduct.isPresent()) {
+            Product product = optionalProduct.get();
+            product.setCustomerArticle(customerArticle);
+            return _productRepository.save(product);
+        }
+        return null;
     }
 }

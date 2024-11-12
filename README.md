@@ -58,26 +58,6 @@ cd Backend
 ### Products Endpoints
 *   GET /products: Получить список всех товаров с пагинацией
 *   GET /products/{id}: Получить информацию о товаре по идентификатору
-*   POST /products: Создать новый товар
-*   PUT /products/{id}/price: Обновить цену товара
-*   PUT /products/{id}/discount: Обновить скидку на товар
-*   PUT /products/{id}/count: Обновить количество товара
-*   DELETE /products/{id}: Удалить товар
-
-### Properties Endpoints
-*   POST /properties: Создать новую характеристику
-*   DELETE /properties/{id}: Удалить характеристику по идентификатору
-
-### Categories Endpoints
-*   GET /categories: Получить список всех категорий
-*   POST /categories: Создать новую категорию
-*   DELETE /categories/{id}: Удалить категорию по идентификатору
-
-### Articles Endpoints
-
-```plaintext
- GET /articles: Получить список всех статей
-```
 ```json
 [
   {
@@ -122,6 +102,26 @@ cd Backend
   }
 ]
  
+```
+*   POST /products: Создать новый товар
+*   PUT /products/{id}/price: Обновить цену товара
+*   PUT /products/{id}/discount: Обновить скидку на товар
+*   PUT /products/{id}/count: Обновить количество товара
+*   DELETE /products/{id}: Удалить товар
+
+### Properties Endpoints
+*   POST /properties: Создать новую характеристику
+*   DELETE /properties/{id}: Удалить характеристику по идентификатору
+
+### Categories Endpoints
+*   GET /categories: Получить список всех категорий
+*   POST /categories: Создать новую категорию
+*   DELETE /categories/{id}: Удалить категорию по идентификатору
+
+### Articles Endpoints
+
+```plaintext
+ GET /articles: Получить список всех статей
 ```
 ```plaintext
 GET /articles/{id}: Получить информацию о статье по идентификатору

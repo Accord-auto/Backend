@@ -2,6 +2,7 @@ package avto.accord.App.Domain.Models.Property;
 
 
 import avto.accord.App.Domain.Models.ProductProperty.ProductProperty;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,5 +22,6 @@ public class Property {
     private int Id;
     private String name;
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<ProductProperty> productProperties;
 }

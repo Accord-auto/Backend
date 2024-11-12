@@ -1,4 +1,4 @@
-package avto.accord.App.Domain.Models.Price;
+package avto.accord.App.Domain.Models.FileInfo;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PriceRequest {
-    private int discount;
-    private int value;
+public class FileInfo {
+    private String name;
+    private String url;
 }
