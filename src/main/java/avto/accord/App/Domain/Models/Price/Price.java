@@ -1,6 +1,7 @@
 package avto.accord.App.Domain.Models.Price;
 
 import avto.accord.App.Domain.Models.Product.Product;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,6 +16,7 @@ public class Price {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @OneToOne(mappedBy = "price")
+    @JsonBackReference
     private Product product;
     private int value;
     private int discount;

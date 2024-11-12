@@ -1,5 +1,7 @@
 package avto.accord.App.Domain.Factory;
 
+import avto.accord.App.Application.Factory.IProductFactory;
+import avto.accord.App.Application.Services.IProductService;
 import avto.accord.App.Domain.Models.Category.Category;
 import avto.accord.App.Domain.Models.Price.Price;
 import avto.accord.App.Domain.Models.Price.PriceRequest;
@@ -11,11 +13,13 @@ import avto.accord.App.Domain.Models.Property.Property;
 import avto.accord.App.Domain.Services.CategoryService.CategoryService;
 import avto.accord.App.Domain.Services.PhotoService.PhotoService;
 import avto.accord.App.Domain.Services.PriceService.PriceService;
+import avto.accord.App.Domain.Services.ProductService.ProductService;
 import avto.accord.App.Domain.Services.PropertyService.PropertyService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,7 +32,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ProductFactory {
+public class ProductFactory implements IProductFactory {
     @Autowired
     private CategoryService _categoryService;
 
@@ -41,39 +45,40 @@ public class ProductFactory {
     @Autowired
     private PriceService _priceService;
 
+    @Autowired
+    @Lazy
+    private IProductService productService;
+    @Override
     public Product createProduct(ProductRequest productRequest) throws IOException {
-        try {
-            Product product = mapToProduct(productRequest);
+        Product product = mapToProduct(productRequest);
 
-            // Сохранение главного фото
-            if (productRequest.getMainPhoto() != null) {
-                String mainPhotoPath = savePhoto(productRequest.getMainPhoto());
-                product.setMainPhotoUrl(mainPhotoPath);
-            }
-
-            // Сохранение дополнительных фото
-            if (productRequest.getAdditionalPhotos() != null) {
-                List<String> additionalPhotoPaths = saveAdditionalPhotos(productRequest.getAdditionalPhotos());
-                product.setAdditionalPhotos(additionalPhotoPaths);
-            }
-
-            // Установка категории
-            Category category = _categoryService.getCategoryById(productRequest.getCategoryId());
-            log.info(category.getName(), "\n лог категории");
-            product.setCategory(category);
-
-            // Установка цены
-            Price price = createPrice(productRequest.getPrice(), product);
-            product.setPrice(price);
-
-            // Установка свойств
-            product.setProperties(mapProperties(productRequest.getProperties(), product));
-
-            return product;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
+        // Сохранение главного фото
+        if (productRequest.getMainPhoto() != null) {
+            String mainPhotoPath = savePhoto(productRequest.getMainPhoto());
+            product.setMainPhotoUrl(mainPhotoPath);
         }
+
+        // Сохранение дополнительных фото
+        if (productRequest.getAdditionalPhotos() != null) {
+            List<String> additionalPhotoPaths = saveAdditionalPhotos(productRequest.getAdditionalPhotos());
+            product.setAdditionalPhotos(additionalPhotoPaths);
+        }
+
+        // Установка категории
+        Category category = _categoryService.getCategoryById(productRequest.getCategoryId());
+        product.setCategory(category);
+
+        // Установка свойств
+        product.setProperties(mapProperties(productRequest.getProperties(), product));
+
+        // Сохранение продукта
+        Product savedProduct = productService.saveProduct(product);
+
+        // Установка цены
+        Price price = createPrice(productRequest.getPrice(), savedProduct);
+        savedProduct.setPrice(price);
+
+        return savedProduct;
     }
 
     private Product mapToProduct(ProductRequest productRequest) {
@@ -117,7 +122,7 @@ public class ProductFactory {
 
     private String savePhoto(MultipartFile photo) throws IOException {
         String photoPath = Paths.get(photo.getOriginalFilename()).getFileName().toString();
-        _photoService.savePhoto(photoPath, photo.getBytes());
+        _photoService.savePhoto(photo);
         return photoPath;
     }
 

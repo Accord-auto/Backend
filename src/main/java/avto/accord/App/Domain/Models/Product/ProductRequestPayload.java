@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductRequest {
+public class ProductRequestPayload {
     private String name;
     private String brand;
     private int count;
@@ -22,10 +22,8 @@ public class ProductRequest {
     private String countType;
     private String description;
     private String article;
-    private MultipartFile mainPhoto;
-    private List<MultipartFile> additionalPhotos;
     private int categoryId;
-    private List<ProductPropertyRequest> properties;
     private boolean specialOffer;
     private String customerArticle;
+    private List<ProductPropertyRequest> properties;
 }

@@ -10,8 +10,10 @@ public interface IProductService {
     Page<Product> getAllProducts(int offset, int limit);
     Product getProductById(int productId);
     Product saveProduct(ProductRequest productRequest) throws IOException;
+    Product saveProduct(Product product);
     boolean deleteProduct(int productId);
     Product updatePrice(int productId, int newPrice);
     Product updateDiscount(int productId, int newDiscount);
     Product updateCount(int productId, int newCount);
+    Product updateCustomerArticle(int id, String customerArticle);
 }

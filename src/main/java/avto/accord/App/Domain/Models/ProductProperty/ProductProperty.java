@@ -15,13 +15,16 @@ public class ProductProperty {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     @JsonBackReference
     private Product product;
     @ManyToOne
     @JoinColumn(name = "property_id", referencedColumnName = "id")
+    @JsonBackReference
     private Property property;
+
     private String value;
 
 }
