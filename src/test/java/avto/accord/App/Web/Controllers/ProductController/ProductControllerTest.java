@@ -1,4 +1,4 @@
-package avto.accord.Interfaces;
+package avto.accord.App.Web.Controllers.ProductController;
 
 import avto.accord.App.Domain.Models.Category.Category;
 import avto.accord.App.Domain.Models.Price.Price;
@@ -11,7 +11,6 @@ import avto.accord.App.Domain.Models.Property.Property;
 import avto.accord.App.Domain.Services.PhotoService.PhotoStorage;
 import avto.accord.App.Domain.Services.ProductRequestService.ProductRequestService;
 import avto.accord.App.Domain.Services.ProductService.ProductService;
-import avto.accord.App.Web.Controllers.ProductController.ProductController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,10 +1,9 @@
-package avto.accord.Interfaces;
+package avto.accord.App.Web.Controllers.ArticleController;
 
 import avto.accord.App.Domain.Models.Article.Article;
 import avto.accord.App.Domain.Models.Article.ArticleRequest;
 import avto.accord.App.Domain.Services.ArticleService.ArticleService;
 import avto.accord.App.Domain.Services.PhotoService.PhotoStorage;
-import avto.accord.App.Web.Controllers.ArticleController.ArticleController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,9 +1,9 @@
-package avto.accord.Interfaces;
+package avto.accord.App.Web.Controllers.CategoryController;
 
 import avto.accord.App.Domain.Models.Category.Category;
 import avto.accord.App.Domain.Models.Category.CategoryRequest;
 import avto.accord.App.Domain.Services.CategoryService.CategoryService;
-import avto.accord.App.Web.Controllers.CategoryController.CategoryController;
+import avto.accord.App.Domain.Services.PhotoService.PhotoStorage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +33,9 @@ public class CategoryControllerTest {
     @MockBean
     private CategoryService categoryService;
 
+    @MockBean
+    private PhotoStorage photoStorage;
+
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
@@ -49,7 +52,7 @@ public class CategoryControllerTest {
 
         when(categoryService.getAllCategories()).thenReturn(categories);
 
-        mockMvc.perform(get("/categories/"))
+        mockMvc.perform(get("/categories"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(categories)));
     }
@@ -62,10 +65,10 @@ public class CategoryControllerTest {
 
         when(categoryService.saveCategory(any(CategoryRequest.class))).thenReturn(category);
 
-        mockMvc.perform(post("/categories/")
+        mockMvc.perform(post("/categories")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().json(objectMapper.writeValueAsString(category)));
     }
 
@@ -76,6 +79,6 @@ public class CategoryControllerTest {
         doNothing().when(categoryService).deleteCategory(categoryId);
 
         mockMvc.perform(delete("/categories/{id}", categoryId))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 }
