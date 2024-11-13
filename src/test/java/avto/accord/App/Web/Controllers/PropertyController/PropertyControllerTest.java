@@ -1,10 +1,9 @@
-package avto.accord.Interfaces;
+package avto.accord.App.Web.Controllers.PropertyController;
 
 import avto.accord.App.Domain.Models.Property.Property;
 import avto.accord.App.Domain.Models.Property.PropertyRequest;
 import avto.accord.App.Domain.Services.PhotoService.PhotoStorage;
 import avto.accord.App.Domain.Services.PropertyService.PropertyService;
-import avto.accord.App.Web.Controllers.PropertyController.PropertyController;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;

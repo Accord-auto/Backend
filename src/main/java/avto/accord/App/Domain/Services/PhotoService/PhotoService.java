@@ -40,4 +40,15 @@ public class PhotoService {
             return new FileInfo(photoName, url);
         }).collect(Collectors.toList());
     }
+    public List<Resource> getPhotos(List<String> photoNames) throws IOException {
+        return photoNames.stream()
+                .map(photoName -> {
+                    try {
+                        return getPhoto(photoName);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
+    }
 }
