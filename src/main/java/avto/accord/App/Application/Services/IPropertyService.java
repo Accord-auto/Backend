@@ -1,9 +1,16 @@
 package avto.accord.App.Application.Services;
 
 import avto.accord.App.Domain.Models.Property.Property;
+import avto.accord.App.Domain.Models.Property.PropertyDTO;
 import avto.accord.App.Domain.Models.Property.PropertyRequest;
+import avto.accord.App.Domain.Models.Property.PropertySimpleDTO;
+
+import java.util.List;
 
 public interface IPropertyService {
     Property saveProperty(PropertyRequest property);
+    List<PropertySimpleDTO> getAllProperties();
+    PropertyDTO getPropertyById(int id);
+    Property getPropertyByIdOnly(int id); // Новый метод
     void deleteProperty(int id);
 }

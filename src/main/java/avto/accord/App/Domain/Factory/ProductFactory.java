@@ -109,7 +109,7 @@ public class ProductFactory implements IProductFactory {
                 .map(propertyRequest -> {
                     ProductProperty productProperty = new ProductProperty();
                     productProperty.setValue(propertyRequest.getValue());
-                    Property property = _propertyService.getPropertyById(propertyRequest.getPropertyId());
+                    Property property = _propertyService.getPropertyByIdOnly(propertyRequest.getPropertyId());
                     if (property == null) {
                         throw new IllegalArgumentException("Property not found");
                     }

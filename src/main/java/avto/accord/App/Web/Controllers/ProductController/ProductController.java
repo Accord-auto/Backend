@@ -1,11 +1,10 @@
 package avto.accord.App.Web.Controllers.ProductController;
 
 import avto.accord.App.Domain.Models.Product.Product;
-import avto.accord.App.Domain.Models.Product.ProductRequest;
 import avto.accord.App.Domain.Models.Product.ProductRequestPayload;
+import avto.accord.App.Domain.Models.Product.ProductSort;
 import avto.accord.App.Domain.Services.ProductRequestService.ProductRequestService;
 import avto.accord.App.Domain.Services.ProductService.ProductService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,10 +34,11 @@ public class ProductController {
 
     @GetMapping
     public Page<Product> getAllProducts(
-            @RequestParam("offset") int offset,
-            @RequestParam("limit") int limit
+            @RequestParam(value = "offset") int offset,
+            @RequestParam(value = "limit") int limit,
+            @RequestParam(value = "sort", defaultValue = "ID_ASC") ProductSort sort
     ) {
-        return productService.getAllProducts(offset, limit);
+        return productService.getAllProducts(offset, limit, sort);
     }
 
     @GetMapping("/{id}")
