@@ -2,35 +2,20 @@ package avto.accord.App.Domain.Services.ProductService;
 
 import avto.accord.App.Application.Factory.IProductFactory;
 import avto.accord.App.Application.Services.IProductService;
-import avto.accord.App.Domain.Factory.ProductFactory;
-import avto.accord.App.Domain.Models.Category.Category;
-import avto.accord.App.Domain.Models.Price.Price;
 import avto.accord.App.Domain.Models.Product.Product;
 import avto.accord.App.Domain.Models.Product.ProductRequest;
-import avto.accord.App.Domain.Models.ProductProperty.ProductProperty;
-import avto.accord.App.Domain.Models.ProductProperty.ProductPropertyRequest;
-import avto.accord.App.Domain.Models.Property.Property;
-import avto.accord.App.Domain.Models.Property.PropertyRequest;
+import avto.accord.App.Domain.Models.Product.ProductSort;
 import avto.accord.App.Domain.Repositories.Product.ProductRepository;
-import avto.accord.App.Domain.Services.CategoryService.CategoryService;
-import avto.accord.App.Domain.Services.PhotoService.PhotoService;
-import avto.accord.App.Domain.Services.PriceService.PriceService;
-import avto.accord.App.Domain.Services.PropertyService.PropertyService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -40,8 +25,9 @@ public class ProductService implements IProductService {
     private final IProductFactory _productFactory;
 
     @Override
-    public Page<Product> getAllProducts(int offset, int limit) {
-        return _productRepository.findAll(PageRequest.of(offset, limit));
+    public Page<Product> getAllProducts(int offset, int limit, ProductSort sort) {
+        Pageable pageable = PageRequest.of(offset, limit, sort.getSortValue());
+        return _productRepository.findAll(pageable);
     }
 
     @Override

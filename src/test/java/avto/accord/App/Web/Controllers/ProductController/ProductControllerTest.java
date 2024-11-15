@@ -5,6 +5,7 @@ import avto.accord.App.Domain.Models.Price.Price;
 import avto.accord.App.Domain.Models.Price.PriceRequest;
 import avto.accord.App.Domain.Models.Product.Product;
 import avto.accord.App.Domain.Models.Product.ProductRequestPayload;
+import avto.accord.App.Domain.Models.Product.ProductSort;
 import avto.accord.App.Domain.Models.ProductProperty.ProductProperty;
 import avto.accord.App.Domain.Models.ProductProperty.ProductPropertyRequest;
 import avto.accord.App.Domain.Models.Property.Property;
@@ -66,19 +67,21 @@ public class ProductControllerTest {
     public void testGetAllProducts() throws Exception {
         int offset = 0;
         int limit = 10;
+        ProductSort sortBy = ProductSort.ID_ASC;
 
         List<Product> products = Arrays.asList(
-                createProduct(1, "Engine Oil", "Castrol", 50, "liters", "High-quality engine oil", "E12345", "path/to/mainPhoto1.jpg", Arrays.asList("path/to/additionalPhoto1.jpg"), 1, 100, 5, 1, "Viscosity", "5W-30"),
-                createProduct(2, "Brake Pads", "Bosch", 100, "units", "High-performance brake pads", "B67890", "path/to/mainPhoto2.jpg", Arrays.asList("path/to/additionalPhoto2.jpg"), 2, 200, 10, 2, "Material", "Ceramic")
+                createProduct(1, "Engine Oil", "Castrol", 50, "liters", "High-quality engine oil", "E12345", "mainPhoto1.jpg", Arrays.asList("additionalPhoto1.jpg"), 1, 100, 5, 1, "Viscosity", "5W-30"),
+                createProduct(2, "Brake Pads", "Bosch", 100, "units", "High-performance brake pads", "B67890", "mainPhoto2.jpg", Arrays.asList("additionalPhoto2.jpg"), 2, 200, 10, 2, "Material", "Ceramic")
         );
 
-        Page<Product> productPage = new PageImpl<>(products, PageRequest.of(offset, limit), products.size());
+        Page<Product> productPage = new PageImpl<>(products, PageRequest.of(offset, limit, sortBy.getSortValue()), products.size());
 
-        when(productService.getAllProducts(anyInt(), anyInt())).thenReturn(productPage);
+        when(productService.getAllProducts(anyInt(), anyInt(), any(ProductSort.class))).thenReturn(productPage);
 
         mockMvc.perform(get("/products")
                         .param("offset", String.valueOf(offset))
                         .param("limit", String.valueOf(limit))
+                        .param("sort", sortBy.name())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(productPage)));
@@ -96,11 +99,11 @@ public class ProductControllerTest {
     @Test
     public void testGetProductById() throws Exception {
         int productId = 1;
-        Product expectedProduct = new Product(1, "Product 1", "Brand 1", 10, "units", "Description 1", "12345", "path/to/mainPhoto1.jpg", Arrays.asList("path/to/additionalPhoto1.jpg"),
+        Product expectedProduct = new Product(1, "Product 1", "Brand 1", 10, "units", "Description 1", "12345", "mainPhoto1.jpg", Arrays.asList("additionalPhoto1.jpg"),
                 new Category(1), new Price(100, 10),
                 Arrays.asList(
                         new ProductProperty(
-                                1, new Product(1, "Engine Oil", "Castrol", 50, "liters", "High-quality engine oil", "E12345", "path/to/mainPhoto1.jpg", Arrays.asList("path/to/additionalPhoto1.jpg"),
+                                1, new Product(1, "Engine Oil", "Castrol", 50, "liters", "High-quality engine oil", "E12345", "mainPhoto1.jpg", Arrays.asList("additionalPhoto1.jpg"),
                                 new Category(1), new Price(100, 5), Arrays.asList()),
                                 new Property(1, "Viscosity", null), "5W-30")));
 
