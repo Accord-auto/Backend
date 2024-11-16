@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 public interface PhotoStorage {
     void init();
-    void savePhoto(MultipartFile file);
+    void savePhoto(MultipartFile file, String fileName);
     Resource loadPhoto(String filename);
     Stream<Path> loadAllPhotos();
 }

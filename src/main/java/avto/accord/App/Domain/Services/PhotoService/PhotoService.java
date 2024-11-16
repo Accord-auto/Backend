@@ -23,8 +23,8 @@ public class PhotoService {
     @Autowired
     private PhotoStorage photoStorage;
 
-    public void savePhoto(MultipartFile file) {
-        photoStorage.savePhoto(file);
+    public void savePhoto(MultipartFile file, String fileName) {
+        photoStorage.savePhoto(file, fileName);
     }
     @Cacheable(value = "photos", key = "#photoname")
     public Resource getPhoto(String photoname) throws IOException {

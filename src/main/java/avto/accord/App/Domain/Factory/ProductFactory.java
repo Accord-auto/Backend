@@ -12,6 +12,7 @@ import avto.accord.App.Domain.Models.ProductProperty.ProductPropertyRequest;
 import avto.accord.App.Domain.Models.Property.Property;
 import avto.accord.App.Domain.Services.CategoryService.CategoryService;
 import avto.accord.App.Domain.Services.PhotoService.PhotoService;
+import avto.accord.App.Domain.Services.PhotoService.PhotoUtils;
 import avto.accord.App.Domain.Services.PriceService.PriceService;
 import avto.accord.App.Domain.Services.ProductService.ProductService;
 import avto.accord.App.Domain.Services.PropertyService.PropertyService;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -37,9 +39,6 @@ public class ProductFactory implements IProductFactory {
     private CategoryService _categoryService;
 
     @Autowired
-    private PhotoService _photoService;
-
-    @Autowired
     private PropertyService _propertyService;
 
     @Autowired
@@ -48,6 +47,9 @@ public class ProductFactory implements IProductFactory {
     @Autowired
     @Lazy
     private IProductService productService;
+    @Autowired
+    private PhotoUtils PhotoUtils;
+
     @Override
     public Product createProduct(ProductRequest productRequest) throws IOException {
         Product product = mapToProduct(productRequest);
@@ -121,9 +123,7 @@ public class ProductFactory implements IProductFactory {
     }
 
     private String savePhoto(MultipartFile photo) throws IOException {
-        String photoPath = Paths.get(photo.getOriginalFilename()).getFileName().toString();
-        _photoService.savePhoto(photo);
-        return photoPath;
+        return PhotoUtils.savePhoto(photo);
     }
 
     private Price createPrice(PriceRequest priceRequest, Product product) {
