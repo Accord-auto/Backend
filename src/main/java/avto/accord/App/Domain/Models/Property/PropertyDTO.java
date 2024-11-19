@@ -1,5 +1,6 @@
 package avto.accord.App.Domain.Models.Property;
 
+import avto.accord.App.Domain.Models.ProductProperty.PropertyValueDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,5 +15,5 @@ import java.util.List;
 public class PropertyDTO {
     private int id;
     private String name;
-    private List<String> values;
+    private List<PropertyValueDTO> values;
 }

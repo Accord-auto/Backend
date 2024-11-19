@@ -1,5 +1,7 @@
 package avto.accord.App.Web.Controllers.PropertyController;
 
+import avto.accord.App.Domain.Models.ProductProperty.DeletePropertyValueRequest;
+import avto.accord.App.Domain.Models.ProductProperty.ProductPropertyRequest;
 import avto.accord.App.Domain.Models.Property.Property;
 import avto.accord.App.Domain.Models.Property.PropertyDTO;
 import avto.accord.App.Domain.Models.Property.PropertyRequest;
@@ -20,22 +22,30 @@ import java.util.List;
 @RequestMapping("/properties")
 public class PropertyController {
     @Autowired
-    private PropertyService _propertyService;
+    private PropertyService propertyService;
     @GetMapping
     public List<PropertySimpleDTO> getAllProperties() {
-        return _propertyService.getAllProperties();
+        return propertyService.getAllProperties();
+    }
+    @PostMapping("/add-value")
+    public PropertyDTO addPropertyValue(@RequestBody ProductPropertyRequest request) {
+        return propertyService.addPropertyValue(request);
+    }
+    @DeleteMapping("/delete-value")
+    public PropertyDTO deletePropertyValue(@RequestBody DeletePropertyValueRequest request) {
+        return propertyService.deletePropertyValue(request);
     }
     @GetMapping("/{id}")
     public PropertyDTO getPropertyById(@PathVariable int id) {
-        return _propertyService.getPropertyById(id);
+        return propertyService.getPropertyById(id);
     }
 
     @PostMapping
     public Property addProperty(@RequestBody PropertyRequest request) {
-        return _propertyService.saveProperty(request);
+        return propertyService.saveProperty(request);
     }
     @DeleteMapping("/{id}")
     public void deleteProperty(@PathVariable int id) {
-        _propertyService.deleteProperty(id);
+        propertyService.deleteProperty(id);
     }
 }
