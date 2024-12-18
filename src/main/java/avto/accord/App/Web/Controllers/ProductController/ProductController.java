@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -52,12 +53,17 @@ public class ProductController {
             @RequestPart("additionalPhotos") List<MultipartFile> additionalPhotos,
             @Parameter(description = "Product request payload", required = true, schema = @Schema(implementation = ProductRequestPayload.class))
             @RequestPart("productRequestPayload") String productRequestPayloadJson
-    ) throws IOException {
+    ) {
         if (additionalPhotos.size() > 3) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("слишком много фотографий. максимум 3!");
         }
-        Product createdProduct = productRequestService.createProduct(mainPhoto, additionalPhotos, productRequestPayloadJson);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
+        try {
+            Product createdProduct = productRequestService.createProduct(mainPhoto, additionalPhotos, productRequestPayloadJson);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
+        } catch (Exception e) {
+            log.error("Error creating product", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка при создании продукта");
+        }
     }
 
 

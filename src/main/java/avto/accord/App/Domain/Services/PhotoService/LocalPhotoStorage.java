@@ -24,11 +24,6 @@ public class LocalPhotoStorage implements PhotoStorage {
         this.photoStoragePath = photoStoragePath;
         this.root = Paths.get(photoStoragePath);
     }
-
-
-    /**
-     * Инициализация хранилища фотографий.
-     */
     @Override
     public void init() {
         try {
@@ -37,12 +32,6 @@ public class LocalPhotoStorage implements PhotoStorage {
             throw new RuntimeException(e);
         }
     }
-
-    /**
-     * Сохранение фотографии.
-     *
-     * @param file файл фотографии
-     */
     @Override
     public void savePhoto(MultipartFile file, String fileName) {
         try {
@@ -54,13 +43,6 @@ public class LocalPhotoStorage implements PhotoStorage {
             throw new RuntimeException(e.getMessage());
         }
     }
-
-    /**
-     * Загрузка фотографии.
-     *
-     * @param filename имя файла фотографии
-     * @return ресурс фотографии
-     */
     @Override
     public Resource loadPhoto(String filename) {
         try {
@@ -76,12 +58,6 @@ public class LocalPhotoStorage implements PhotoStorage {
             throw new RuntimeException("Error: " + e.getMessage());
         }
     }
-
-    /**
-     * Загрузка всех фотографий.
-     *
-     * @return поток путей к фотографиям
-     */
     @Override
     public Stream<Path> loadAllPhotos() {
         try {

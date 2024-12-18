@@ -22,7 +22,7 @@ public class Property {
     private int Id;
     @Column(unique = true, nullable = false)
     private String name;
-    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "property", cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JsonManagedReference
     private List<ProductProperty> productProperties;
 }

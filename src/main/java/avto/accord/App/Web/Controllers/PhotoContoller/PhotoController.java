@@ -4,6 +4,7 @@ import avto.accord.App.Domain.Models.FileInfo.FileInfo;
 import avto.accord.App.Domain.Services.PhotoService.PhotoService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -31,23 +32,33 @@ public class PhotoController {
     }
 
     @GetMapping("/{photoname}")
-    public ResponseEntity<Resource> getPhoto(@PathVariable String photoname) throws IOException {
-        Resource photo = photoService.getPhoto(photoname);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + photo.getFilename() + "\"")
-                .contentType(MediaType.IMAGE_JPEG)
-                .body(photo);
+    public ResponseEntity<Resource> getPhoto(@PathVariable String photoname) {
+        try {
+            Resource photo = photoService.getPhoto(photoname);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + photo.getFilename() + "\"")
+                    .contentType(MediaType.IMAGE_JPEG)
+                    .body(photo);
+        } catch (Exception e) {
+            log.error("Error retrieving photo", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-    @GetMapping()
-    public void getPhotos(@RequestParam List<String> photoNames, HttpServletResponse response) throws IOException {
-        List<Resource> photos = photoService.getPhotos(photoNames);
+    @GetMapping
+    public void getPhotos(@RequestParam List<String> photoNames, HttpServletResponse response) {
+        try {
+            List<Resource> photos = photoService.getPhotos(photoNames);
 
-        response.setContentType(MediaType.MULTIPART_MIXED_VALUE);
-        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"photos\"");
+            response.setContentType(MediaType.MULTIPART_MIXED_VALUE);
+            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"photos\"");
 
-        for (Resource photo : photos) {
-            response.getOutputStream().write(photo.getInputStream().readAllBytes());
+            for (Resource photo : photos) {
+                response.getOutputStream().write(photo.getInputStream().readAllBytes());
+            }
+        } catch (IOException e) {
+            log.error("Error retrieving photos", e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 }
