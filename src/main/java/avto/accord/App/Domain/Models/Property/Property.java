@@ -21,7 +21,7 @@ public class Property {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int Id;
     private String name;
-    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "property", cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JsonManagedReference
     private List<ProductProperty> productProperties;
 }

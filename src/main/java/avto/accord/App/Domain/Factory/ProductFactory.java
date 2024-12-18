@@ -15,6 +15,7 @@ import avto.accord.App.Domain.Services.PhotoService.PhotoService;
 import avto.accord.App.Domain.Services.PriceService.PriceService;
 import avto.accord.App.Domain.Services.ProductService.ProductService;
 import avto.accord.App.Domain.Services.PropertyService.PropertyService;
+import avto.accord.App.Infrastructure.Components.Mapper.ProductPropertyMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -48,6 +50,7 @@ public class ProductFactory implements IProductFactory {
     @Autowired
     @Lazy
     private IProductService productService;
+
     @Override
     public Product createProduct(ProductRequest productRequest) throws IOException {
         Product product = mapToProduct(productRequest);
@@ -100,28 +103,27 @@ public class ProductFactory implements IProductFactory {
         return additionalPhotoPaths;
     }
 
-
-    // ! очень страшный метод😡
-    // ? но нужно ли его оптимизировать
-    // TODO: обдумать полезность оптимизации метода
     private List<ProductProperty> mapProperties(List<ProductPropertyRequest> propertyRequests, Product product) {
         return propertyRequests.stream()
-                .map(propertyRequest -> {
-                    ProductProperty productProperty = new ProductProperty();
-                    productProperty.setValue(propertyRequest.getValue());
-                    Property property = _propertyService.getPropertyById(propertyRequest.getPropertyId());
-                    if (property == null) {
-                        throw new IllegalArgumentException("Property not found");
-                    }
-                    productProperty.setProperty(property);
-                    productProperty.setProduct(product);
-                    return productProperty;
-                })
+                .map(propertyRequest -> mapPropertyRequestToProductProperty(propertyRequest, product))
                 .collect(Collectors.toList());
     }
 
+    private ProductProperty mapPropertyRequestToProductProperty(ProductPropertyRequest propertyRequest, Product product) {
+        ProductProperty productProperty = ProductPropertyMapper.INSTANCE.toProductProperty(propertyRequest);
+
+        Property property = _propertyService.getPropertyById(propertyRequest.getPropertyId());
+        if (property == null) {
+            throw new IllegalArgumentException("Property not found");
+        }
+
+        productProperty.setProperty(property);
+        productProperty.setProduct(product);
+        return productProperty;
+    }
+
     private String savePhoto(MultipartFile photo) throws IOException {
-        String photoPath = Paths.get(photo.getOriginalFilename()).getFileName().toString();
+        String photoPath = Paths.get(Objects.requireNonNull(photo.getOriginalFilename())).getFileName().toString();
         _photoService.savePhoto(photo);
         return photoPath;
     }

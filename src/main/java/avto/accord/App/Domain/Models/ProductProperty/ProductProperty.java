@@ -24,7 +24,5 @@ public class ProductProperty {
     @JoinColumn(name = "property_id", referencedColumnName = "id")
     @JsonBackReference
     private Property property;
-
     private String value;
-
 }

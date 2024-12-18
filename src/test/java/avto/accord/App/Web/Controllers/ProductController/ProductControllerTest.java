@@ -29,6 +29,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -63,7 +64,7 @@ public class ProductControllerTest {
 
 
     @Test
-    public void testGetAllProducts() throws Exception {
+    public void testGetAllProducts() {
         int offset = 0;
         int limit = 10;
 
@@ -76,12 +77,16 @@ public class ProductControllerTest {
 
         when(productService.getAllProducts(anyInt(), anyInt())).thenReturn(productPage);
 
-        mockMvc.perform(get("/products")
-                        .param("offset", String.valueOf(offset))
-                        .param("limit", String.valueOf(limit))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(productPage)));
+        try {
+            mockMvc.perform(get("/products")
+                            .param("offset", String.valueOf(offset))
+                            .param("limit", String.valueOf(limit))
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(content().json(objectMapper.writeValueAsString(productPage)));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Product createProduct(int id, String name, String brand, int count, String countType, String description, String article, String mainPhotoUrl, List<String> additionalPhotos, int categoryId, int priceValue, int priceDiscount, int propertyId, String propertyName, String propertyValue) {
@@ -94,7 +99,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    public void testGetProductById() throws Exception {
+    public void testGetProductById() {
         int productId = 1;
         Product expectedProduct = new Product(1, "Product 1", "Brand 1", 10, "units", "Description 1", "12345", "path/to/mainPhoto1.jpg", Arrays.asList("path/to/additionalPhoto1.jpg"),
                 new Category(1), new Price(100, 10),
@@ -106,16 +111,20 @@ public class ProductControllerTest {
 
         when(productService.getProductById(anyInt())).thenReturn(expectedProduct);
 
-        mockMvc.perform(get("/products/{id}", productId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(expectedProduct)));
+        try {
+            mockMvc.perform(get("/products/{id}", productId)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isOk())
+                    .andExpect(content().json(objectMapper.writeValueAsString(expectedProduct)));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
 
     @Test
-    public void testCreateProduct() throws Exception {
+    public void testCreateProduct(){
         ProductRequestPayload productRequestPayload = new ProductRequestPayload();
         productRequestPayload.setName("Engine Oil");
         productRequestPayload.setBrand("Castrol");
@@ -173,22 +182,23 @@ public class ProductControllerTest {
         expectedProduct.setSpecialOffer(true);
         expectedProduct.setCustomerArticle("CUST123");
 
-        // Настройка мок-объекта
-        when(productRequestService.createProduct(any(MultipartFile.class), anyList(), anyString())).thenReturn(expectedProduct);
-
-        // Выполнение запроса
-        mockMvc.perform(multipart("/products")
-                        .file(mainPhoto)
-                        .file(additionalPhoto1)
-                        .file(additionalPhoto2)
-                        .file(new MockMultipartFile("productRequestPayload", "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsString(productRequestPayload).getBytes()))
-                        .contentType(MediaType.MULTIPART_FORM_DATA))
-                .andExpect(status().isCreated())
-                .andExpect(content().json(objectMapper.writeValueAsString(expectedProduct)));
+        try {
+            when(productRequestService.createProduct(any(MultipartFile.class), anyList(), anyString())).thenReturn(expectedProduct);
+            mockMvc.perform(multipart("/products")
+                            .file(mainPhoto)
+                            .file(additionalPhoto1)
+                            .file(additionalPhoto2)
+                            .file(new MockMultipartFile("productRequestPayload", "", MediaType.APPLICATION_JSON_VALUE, objectMapper.writeValueAsString(productRequestPayload).getBytes()))
+                            .contentType(MediaType.MULTIPART_FORM_DATA))
+                    .andExpect(status().isCreated())
+                    .andExpect(content().json(objectMapper.writeValueAsString(expectedProduct)));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
-    public void testUpdateProductPrice() throws Exception {
+    public void testUpdateProductPrice() {
         int productId = 1;
         int newPrice = 200;
         Product expectedProduct = new Product();
@@ -197,14 +207,18 @@ public class ProductControllerTest {
 
         when(productService.updatePrice(anyInt(), anyInt())).thenReturn(expectedProduct);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/products/{id}/price", productId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newPrice)))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(expectedProduct)));
+        try {
+            mockMvc.perform(MockMvcRequestBuilders.put("/products/{id}/price", productId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(newPrice)))
+                    .andExpect(status().isOk())
+                    .andExpect(content().json(objectMapper.writeValueAsString(expectedProduct)));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
     @Test
-    public void testUpdateCustomerArticle() throws Exception {
+    public void testUpdateCustomerArticle() {
         int productId = 1;
         String newCustomerArticle = "NEWCUST123";
 
@@ -214,14 +228,18 @@ public class ProductControllerTest {
 
         when(productService.updateCustomerArticle(productId, newCustomerArticle)).thenReturn(updatedProduct);
 
-        mockMvc.perform(put("/products/{id}/customerArticle", productId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(newCustomerArticle))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(updatedProduct)));
+        try {
+            mockMvc.perform(put("/products/{id}/customerArticle", productId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(newCustomerArticle))
+                    .andExpect(status().isOk())
+                    .andExpect(content().json(objectMapper.writeValueAsString(updatedProduct)));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
     @Test
-    public void testUpdateProductDiscount() throws Exception {
+    public void testUpdateProductDiscount() {
         int productId = 1;
         int newDiscount = 20;
         Product expectedProduct = new Product();
@@ -230,15 +248,19 @@ public class ProductControllerTest {
 
         when(productService.updateDiscount(anyInt(), anyInt())).thenReturn(expectedProduct);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/products/{id}/discount", productId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newDiscount)))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(expectedProduct)));
+        try {
+            mockMvc.perform(MockMvcRequestBuilders.put("/products/{id}/discount", productId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(newDiscount)))
+                    .andExpect(status().isOk())
+                    .andExpect(content().json(objectMapper.writeValueAsString(expectedProduct)));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
-    public void testUpdateProductCount() throws Exception {
+    public void testUpdateProductCount() {
         int productId = 1;
         int newCount = 20;
         Product expectedProduct = new Product();
@@ -247,21 +269,29 @@ public class ProductControllerTest {
 
         when(productService.updateCount(anyInt(), anyInt())).thenReturn(expectedProduct);
 
-        mockMvc.perform(MockMvcRequestBuilders.put("/products/{id}/count", productId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(newCount)))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(expectedProduct)));
+        try {
+            mockMvc.perform(MockMvcRequestBuilders.put("/products/{id}/count", productId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(newCount)))
+                    .andExpect(status().isOk())
+                    .andExpect(content().json(objectMapper.writeValueAsString(expectedProduct)));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
-    public void testDeleteProduct() throws Exception {
+    public void testDeleteProduct() {
         int productId = 1;
 
         when(productService.deleteProduct(anyInt())).thenReturn(true);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/products/{id}", productId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+        try {
+            mockMvc.perform(MockMvcRequestBuilders.delete("/products/{id}", productId)
+                            .contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isNoContent());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

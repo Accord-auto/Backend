@@ -56,7 +56,8 @@ public class ProductService implements IProductService {
             Product product = _productFactory.createProduct(productRequest);
             return _productRepository.save(product);
         } catch (RuntimeException e) {
-            throw new RuntimeException(e);
+            log.error("Error saving product: {}", e.getMessage(), e);
+            throw new RuntimeException("Error saving product", e);
         }
     }
     public Product saveProduct(Product product) {
@@ -105,6 +106,7 @@ public class ProductService implements IProductService {
             product.setCustomerArticle(customerArticle);
             return _productRepository.save(product);
         }
+        log.error("Product with ID {} not found", id);
         return null;
     }
 }

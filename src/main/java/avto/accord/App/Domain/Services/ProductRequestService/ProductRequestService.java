@@ -4,6 +4,7 @@ import avto.accord.App.Application.Services.IProductService;
 import avto.accord.App.Domain.Models.Product.Product;
 import avto.accord.App.Domain.Models.Product.ProductRequest;
 import avto.accord.App.Domain.Models.Product.ProductRequestPayload;
+import avto.accord.App.Infrastructure.Components.Mapper.ProductRequestMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import java.util.List;
 
 @Service
 public class ProductRequestService {
-
     @Autowired
     private IProductService productService;
 
@@ -23,18 +23,9 @@ public class ProductRequestService {
         ObjectMapper objectMapper = new ObjectMapper();
         ProductRequestPayload productRequestPayload = objectMapper.readValue(productRequestPayloadJson, ProductRequestPayload.class);
 
-        ProductRequest productRequest = new ProductRequest();
-        productRequest.setName(productRequestPayload.getName());
-        productRequest.setBrand(productRequestPayload.getBrand());
-        productRequest.setCount(productRequestPayload.getCount());
-        productRequest.setPrice(productRequestPayload.getPrice());
-        productRequest.setCountType(productRequestPayload.getCountType());
-        productRequest.setDescription(productRequestPayload.getDescription());
-        productRequest.setArticle(productRequestPayload.getArticle());
+        ProductRequest productRequest = ProductRequestMapper.INSTANCE.toProductRequest(productRequestPayload);
         productRequest.setMainPhoto(mainPhoto);
         productRequest.setAdditionalPhotos(additionalPhotos);
-        productRequest.setCategoryId(productRequestPayload.getCategoryId());
-        productRequest.setProperties(productRequestPayload.getProperties());
 
         return productService.saveProduct(productRequest);
     }
