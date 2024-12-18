@@ -6,6 +6,7 @@ import avto.accord.App.Domain.Models.Article.ArticleRequest;
 
 import avto.accord.App.Domain.Repositories.Article.ArticleRepository;
 import avto.accord.App.Domain.Services.PhotoService.PhotoService;
+import avto.accord.App.Domain.Services.PhotoService.PhotoUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class ArticleService implements IArticleService {
@@ -22,7 +24,7 @@ public class ArticleService implements IArticleService {
     private ArticleRepository articleRepository;
 
     @Autowired
-    private PhotoService _photoService;
+    private PhotoUtils photoUtils;
 
     @Override
     public List<Article> getAllArticles() {
@@ -60,10 +62,8 @@ public class ArticleService implements IArticleService {
     public void deleteArticle(int id) {
         articleRepository.deleteById(id);
     }
-
-    private String savePhoto(MultipartFile photo) throws IOException {
-        String photoPath = Paths.get(photo.getOriginalFilename()).getFileName().toString();
-        _photoService.savePhoto(photo);
-        return photoPath;
+    public String savePhoto(MultipartFile photo) throws IOException {
+        return photoUtils.savePhoto(photo);
     }
+
 }

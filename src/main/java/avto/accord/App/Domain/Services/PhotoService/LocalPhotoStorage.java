@@ -9,10 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.file.FileSystemAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.stream.Stream;
 
 
@@ -36,11 +33,11 @@ public class LocalPhotoStorage implements PhotoStorage {
         }
     }
     @Override
-    public void savePhoto(MultipartFile file) {
+    public void savePhoto(MultipartFile file, String fileName) {
         try {
-            Files.copy(file.getInputStream(), this.root.resolve(file.getOriginalFilename()));
+            Files.copy(file.getInputStream(), this.root.resolve(fileName));
         } catch (Exception e) {
-            if(e instanceof FileSystemAlreadyExistsException){
+            if (e instanceof FileAlreadyExistsException) {
                 throw new RuntimeException("file already exists");
             }
             throw new RuntimeException(e.getMessage());

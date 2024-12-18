@@ -20,6 +20,7 @@ public class Property {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int Id;
+    @Column(unique = true, nullable = false)
     private String name;
     @OneToMany(mappedBy = "property", cascade = CascadeType.PERSIST, orphanRemoval = true)
     @JsonManagedReference
