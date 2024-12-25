@@ -1,6 +1,6 @@
 package avto.accord.App.Domain.Services.ProductService;
 
-import avto.accord.App.Application.Factory.IProductFactory;
+import avto.accord.App.Application.Facade.IProductFacade;
 import avto.accord.App.Application.Services.IProductService;
 import avto.accord.App.Domain.Models.Product.Product;
 import avto.accord.App.Domain.Models.Product.ProductRequest;
@@ -22,7 +22,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProductService implements IProductService {
     private final ProductRepository _productRepository;
-    private final IProductFactory _productFactory;
+    private final IProductFacade _productFacade;
 
     @Override
     public Page<Product> getAllProducts(int offset, int limit, ProductSort sort) {
@@ -39,7 +39,7 @@ public class ProductService implements IProductService {
     @Override
     public Product saveProduct(ProductRequest productRequest) throws IOException {
         try {
-            Product product = _productFactory.createProduct(productRequest);
+            Product product = _productFacade.createProduct(productRequest);
             return _productRepository.save(product);
         } catch (RuntimeException e) {
             log.error("Error saving product: {}", e.getMessage(), e);

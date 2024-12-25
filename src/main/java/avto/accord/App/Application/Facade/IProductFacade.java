@@ -1,10 +1,10 @@
-package avto.accord.App.Application.Factory;
+package avto.accord.App.Application.Facade;
 
 import avto.accord.App.Domain.Models.Product.Product;
 import avto.accord.App.Domain.Models.Product.ProductRequest;
 
 import java.io.IOException;
 
-public interface IProductFactory {
+public interface IProductFacade {
     Product createProduct(ProductRequest productRequest) throws IOException;
 }

@@ -13,7 +13,7 @@ public interface IPropertyService {
     Property saveProperty(PropertyRequest property);
     List<PropertySimpleDTO> getAllProperties();
     PropertyDTO getPropertyById(int id);
-    Property getPropertyByIdOnly(int id); // Новый метод
+    Property getPropertyByIdOnly(int id);
     void deleteProperty(int id);
     PropertyDTO addPropertyValue(ProductPropertyRequest request);
     PropertyDTO deletePropertyValue(DeletePropertyValueRequest request);

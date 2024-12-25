@@ -1,15 +1,14 @@
 package avto.accord.App.Web.Controllers.ProductController;
 
+import avto.accord.App.Application.Services.IProductService;
 import avto.accord.App.Domain.Models.Product.Product;
 import avto.accord.App.Domain.Models.Product.ProductRequestPayload;
 import avto.accord.App.Domain.Models.Product.ProductSort;
 import avto.accord.App.Domain.Services.ProductRequestService.ProductRequestService;
-import avto.accord.App.Domain.Services.ProductService.ProductService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -29,7 +27,7 @@ import java.util.List;
 @RequestMapping("/products")
 public class ProductController {
     @Autowired
-    private ProductService productService;
+    private IProductService productService;
     @Autowired
     private ProductRequestService productRequestService;
 
