@@ -1,6 +1,7 @@
 package avto.accord.App.Domain.Services.PhotoService;
 
 import avto.accord.App.Domain.Models.FileInfo.FileInfo;
+import avto.accord.App.Infrastructure.Components.Photos.PhotoStorage;
 import avto.accord.App.Web.Controllers.PhotoContoller.PhotoController;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

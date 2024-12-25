@@ -5,10 +5,11 @@ import avto.accord.App.Domain.Models.Price.Price;
 import avto.accord.App.Domain.Models.Price.PriceRequest;
 import avto.accord.App.Domain.Models.Product.Product;
 import avto.accord.App.Domain.Models.Product.ProductRequestPayload;
+import avto.accord.App.Domain.Models.Product.ProductSort;
 import avto.accord.App.Domain.Models.ProductProperty.ProductProperty;
 import avto.accord.App.Domain.Models.ProductProperty.ProductPropertyRequest;
 import avto.accord.App.Domain.Models.Property.Property;
-import avto.accord.App.Domain.Services.PhotoService.PhotoStorage;
+import avto.accord.App.Infrastructure.Components.Photos.PhotoStorage;
 import avto.accord.App.Domain.Services.ProductRequestService.ProductRequestService;
 import avto.accord.App.Domain.Services.ProductService.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,7 +30,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -75,7 +75,7 @@ public class ProductControllerTest {
 
         Page<Product> productPage = new PageImpl<>(products, PageRequest.of(offset, limit), products.size());
 
-        when(productService.getAllProducts(anyInt(), anyInt())).thenReturn(productPage);
+        when(productService.getAllProducts(anyInt(), anyInt(),ProductSort.ID_DESC)).thenReturn(productPage);
 
         try {
             mockMvc.perform(get("/products")

@@ -1,7 +1,6 @@
 package avto.accord;
 
-import avto.accord.App.Domain.Services.PhotoService.PhotoStorage;
-import jakarta.annotation.Resource;
+import avto.accord.App.Infrastructure.Components.Photos.PhotoStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;

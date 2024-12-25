@@ -1,6 +1,5 @@
-package avto.accord.App.Domain.Services.PhotoService;
+package avto.accord.App.Infrastructure.Components.Photos;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;

@@ -5,17 +5,14 @@ import avto.accord.App.Domain.Models.Article.Article;
 import avto.accord.App.Domain.Models.Article.ArticleRequest;
 
 import avto.accord.App.Domain.Repositories.Article.ArticleRepository;
-import avto.accord.App.Domain.Services.PhotoService.PhotoService;
-import avto.accord.App.Domain.Services.PhotoService.PhotoUtils;
+import avto.accord.App.Infrastructure.Components.Photos.PhotoUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class ArticleService implements IArticleService {

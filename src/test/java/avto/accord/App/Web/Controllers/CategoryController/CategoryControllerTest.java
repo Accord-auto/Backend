@@ -3,7 +3,7 @@ package avto.accord.App.Web.Controllers.CategoryController;
 import avto.accord.App.Domain.Models.Category.Category;
 import avto.accord.App.Domain.Models.Category.CategoryRequest;
 import avto.accord.App.Domain.Services.CategoryService.CategoryService;
-import avto.accord.App.Domain.Services.PhotoService.PhotoStorage;
+import avto.accord.App.Infrastructure.Components.Photos.PhotoStorage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

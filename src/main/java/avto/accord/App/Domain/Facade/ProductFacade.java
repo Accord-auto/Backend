@@ -12,8 +12,7 @@ import avto.accord.App.Domain.Models.Product.ProductRequest;
 import avto.accord.App.Domain.Models.ProductProperty.ProductProperty;
 import avto.accord.App.Domain.Models.ProductProperty.ProductPropertyRequest;
 import avto.accord.App.Domain.Models.Property.Property;
-import avto.accord.App.Domain.Services.PhotoService.PhotoService;
-import avto.accord.App.Domain.Services.PhotoService.PhotoUtils;
+import avto.accord.App.Infrastructure.Components.Photos.PhotoUtils;
 import avto.accord.App.Domain.Services.PriceService.PriceService;
 import avto.accord.App.Infrastructure.Components.Mapper.ProductPropertyMapper;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +23,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j

@@ -6,7 +6,7 @@ import avto.accord.App.Domain.Models.ProductProperty.PropertyValueDTO;
 import avto.accord.App.Domain.Models.Property.Property;
 import avto.accord.App.Domain.Models.Property.PropertyDTO;
 import avto.accord.App.Domain.Models.Property.PropertyRequest;
-import avto.accord.App.Domain.Services.PhotoService.PhotoStorage;
+import avto.accord.App.Infrastructure.Components.Photos.PhotoStorage;
 import avto.accord.App.Domain.Services.PropertyService.PropertyService;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
