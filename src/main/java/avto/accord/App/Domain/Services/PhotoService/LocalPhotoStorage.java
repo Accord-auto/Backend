@@ -18,6 +18,7 @@ public class LocalPhotoStorage implements PhotoStorage {
 
     @Value("${photo.storage.path}")
     private String photoStoragePath;
+
     private final Path root;
 
     public LocalPhotoStorage(@Value("${photo.storage.path}") String photoStoragePath) {

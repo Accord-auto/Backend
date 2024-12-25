@@ -1,7 +1,9 @@
-package avto.accord.App.Domain.Factory;
+package avto.accord.App.Domain.Facade;
 
-import avto.accord.App.Application.Factory.IProductFactory;
+import avto.accord.App.Application.Facade.IProductFacade;
+import avto.accord.App.Application.Services.ICategoryService;
 import avto.accord.App.Application.Services.IProductService;
+import avto.accord.App.Application.Services.IPropertyService;
 import avto.accord.App.Domain.Models.Category.Category;
 import avto.accord.App.Domain.Models.Price.Price;
 import avto.accord.App.Domain.Models.Price.PriceRequest;
@@ -10,14 +12,11 @@ import avto.accord.App.Domain.Models.Product.ProductRequest;
 import avto.accord.App.Domain.Models.ProductProperty.ProductProperty;
 import avto.accord.App.Domain.Models.ProductProperty.ProductPropertyRequest;
 import avto.accord.App.Domain.Models.Property.Property;
-import avto.accord.App.Domain.Services.CategoryService.CategoryService;
 import avto.accord.App.Domain.Services.PhotoService.PhotoService;
+import avto.accord.App.Domain.Services.PhotoService.PhotoUtils;
 import avto.accord.App.Domain.Services.PriceService.PriceService;
-import avto.accord.App.Domain.Services.ProductService.ProductService;
-import avto.accord.App.Domain.Services.PropertyService.PropertyService;
 import avto.accord.App.Infrastructure.Components.Mapper.ProductPropertyMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -34,15 +33,15 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ProductFactory implements IProductFactory {
+public class ProductFacade implements IProductFacade {
     @Autowired
-    private CategoryService _categoryService;
+    private ICategoryService _categoryService;
 
     @Autowired
-    private PhotoService _photoService;
+    private PhotoUtils photoUtils;
 
     @Autowired
-    private PropertyService _propertyService;
+    private IPropertyService _propertyService;
 
     @Autowired
     private PriceService _priceService;
@@ -112,7 +111,7 @@ public class ProductFactory implements IProductFactory {
     private ProductProperty mapPropertyRequestToProductProperty(ProductPropertyRequest propertyRequest, Product product) {
         ProductProperty productProperty = ProductPropertyMapper.INSTANCE.toProductProperty(propertyRequest);
 
-        Property property = _propertyService.getPropertyById(propertyRequest.getPropertyId());
+        Property property = _propertyService.getPropertyByIdOnly(propertyRequest.getPropertyId());
         if (property == null) {
             throw new IllegalArgumentException("Property not found");
         }
@@ -123,9 +122,7 @@ public class ProductFactory implements IProductFactory {
     }
 
     private String savePhoto(MultipartFile photo) throws IOException {
-        String photoPath = Paths.get(Objects.requireNonNull(photo.getOriginalFilename())).getFileName().toString();
-        _photoService.savePhoto(photo);
-        return photoPath;
+        return photoUtils.savePhoto(photo);
     }
 
     private Price createPrice(PriceRequest priceRequest, Product product) {

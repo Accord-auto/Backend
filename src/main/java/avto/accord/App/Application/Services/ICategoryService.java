@@ -9,4 +9,5 @@ public interface ICategoryService {
     List<Category> getAllCategories();
     Category saveCategory(CategoryRequest category);
     void deleteCategory(int id);
+    Category getCategoryById(int id);
 }
