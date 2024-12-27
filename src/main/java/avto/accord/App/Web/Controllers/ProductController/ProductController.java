@@ -49,7 +49,7 @@ public class ProductController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<> createProduct(
+    public ResponseEntity<?> createProduct(
             @RequestPart("mainPhoto") MultipartFile mainPhoto,
             @RequestPart("additionalPhotos") List<MultipartFile> additionalPhotos,
             @Parameter(description = "Product request payload", required = true, schema = @Schema(implementation = ProductRequestPayload.class))
