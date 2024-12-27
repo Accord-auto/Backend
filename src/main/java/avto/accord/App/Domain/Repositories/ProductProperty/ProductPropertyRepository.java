@@ -3,4 +3,5 @@ import avto.accord.App.Domain.Models.ProductProperty.ProductProperty;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProductPropertyRepository extends JpaRepository<ProductProperty, Integer> {
+    ProductProperty findByPropertyIdAndValue(int propertyId, String value);
 }

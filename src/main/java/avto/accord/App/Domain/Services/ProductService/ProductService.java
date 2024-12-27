@@ -25,7 +25,12 @@ public class ProductService implements IProductService {
     private final IProductFacade _productFacade;
 
     @Override
-    public Page<Product> getAllProducts(int offset, int limit, ProductSort sort) {
+    public Product getSpecialOffer() {
+        return _productRepository.findRandomSpecialOfferProduct();
+    }
+
+    @Override
+    public Page<Product> getAllProducts(int offset, int limit,ProductSort sort) {
         Pageable pageable = PageRequest.of(offset, limit, sort.getSortValue());
         return _productRepository.findAll(pageable);
     }

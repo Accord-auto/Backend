@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import java.io.IOException;
 
 public interface IProductService {
+    Product getSpecialOffer();
     Page<Product> getAllProducts(int offset, int limit, ProductSort sort);
     Product getProductById(int productId);
     Product saveProduct(ProductRequest productRequest) throws IOException;

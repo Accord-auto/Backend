@@ -39,7 +39,10 @@ public class ProductController {
     ) {
         return productService.getAllProducts(offset, limit, sort);
     }
-
+    @GetMapping("/specialOffer")
+    public Product getSpecialOffer() {
+        return null;
+    }
     @GetMapping("/{id}")
     public Product getProduct(@PathVariable int id) {
         return productService.getProductById(id);

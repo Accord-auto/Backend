@@ -25,7 +25,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -102,20 +101,30 @@ public class ProductFacade implements IProductFacade {
     private List<ProductProperty> mapProperties(List<ProductPropertyRequest> propertyRequests, Product product) {
         return propertyRequests.stream()
                 .map(propertyRequest -> mapPropertyRequestToProductProperty(propertyRequest, product))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private ProductProperty mapPropertyRequestToProductProperty(ProductPropertyRequest propertyRequest, Product product) {
-        ProductProperty productProperty = ProductPropertyMapper.INSTANCE.toProductProperty(propertyRequest);
-
         Property property = _propertyService.getPropertyByIdOnly(propertyRequest.getPropertyId());
         if (property == null) {
             throw new IllegalArgumentException("Property not found");
         }
 
-        productProperty.setProperty(property);
-        productProperty.setProduct(product);
-        return productProperty;
+        // Проверяем существование значения свойства
+        ProductProperty existingProperty = _propertyService.findProductPropertyByPropertyIdAndValue(
+                property.getId(),
+                propertyRequest.getValue()
+        );
+
+        if (existingProperty != null) {
+            return existingProperty;
+        }
+
+        // Если значение не найдено, создаем новое
+        ProductProperty newProperty = ProductPropertyMapper.INSTANCE.toProductProperty(propertyRequest);
+        newProperty.setProperty(property);
+        newProperty.setProduct(product);
+        return newProperty;
     }
 
     private String savePhoto(MultipartFile photo) throws IOException {

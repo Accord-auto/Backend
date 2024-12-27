@@ -25,6 +25,11 @@ public class PropertyService implements IPropertyService {
     private final ProductPropertyRepository productPropertyRepository;
 
     @Override
+    public ProductProperty findProductPropertyByPropertyIdAndValue(int propertyId, String value) {
+        return productPropertyRepository.findByPropertyIdAndValue(propertyId, value);
+    }
+
+    @Override
     public PropertyDTO addPropertyValue(ProductPropertyRequest request) {
         Property property = propertyRepository.findById(request.getPropertyId())
                 .orElseThrow(() -> new ResourceNotFoundException("Property not found with id " + request.getPropertyId()));
@@ -48,6 +53,7 @@ public class PropertyService implements IPropertyService {
             throw e;
         }
     }
+
     @Override
     public List<PropertySimpleDTO> getAllProperties() {
         List<Property> properties = propertyRepository.findAll();
@@ -73,6 +79,7 @@ public class PropertyService implements IPropertyService {
         return propertyRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Property not found with id " + id));
     }
+
     @Override
     public PropertyDTO deletePropertyValue(DeletePropertyValueRequest request) {
         productPropertyRepository.deleteById(request.getIdValue());
