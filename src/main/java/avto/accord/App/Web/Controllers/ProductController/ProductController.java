@@ -41,7 +41,7 @@ public class ProductController {
     }
     @GetMapping("/specialOffer")
     public Product getSpecialOffer() {
-        return null;
+        return productService.getSpecialOffer();
     }
     @GetMapping("/{id}")
     public Product getProduct(@PathVariable int id) {
@@ -49,7 +49,7 @@ public class ProductController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createProduct(
+    public ResponseEntity<> createProduct(
             @RequestPart("mainPhoto") MultipartFile mainPhoto,
             @RequestPart("additionalPhotos") List<MultipartFile> additionalPhotos,
             @Parameter(description = "Product request payload", required = true, schema = @Schema(implementation = ProductRequestPayload.class))
