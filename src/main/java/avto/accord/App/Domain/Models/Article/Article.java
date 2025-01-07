@@ -20,5 +20,6 @@ public class Article {
     private int id;
     private String title;
     private String photoUrl;
+    @Column(nullable = false, length = 1000)
     private String description;
 }
