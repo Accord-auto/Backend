@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Slf4j
@@ -44,6 +45,7 @@ public class CategoryService implements ICategoryService {
 
     @Override
     public Category getCategoryById(int id) {
-        return _categoryRepository.findById(id).get();
+        return _categoryRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Category not found for ID: " + id));
     }
 }

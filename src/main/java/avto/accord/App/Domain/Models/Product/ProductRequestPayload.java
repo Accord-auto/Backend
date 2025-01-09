@@ -4,6 +4,7 @@ import avto.accord.App.Domain.Models.Price.PriceRequest;
 import avto.accord.App.Domain.Models.ProductProperty.ProductPropertyRequest;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -21,5 +22,5 @@ public class ProductRequestPayload {
     private int categoryId;
     private boolean specialOffer;
     private String customerArticle;
-    private List<ProductPropertyRequest> properties;
+    private List<ProductPropertyRequest> properties = new ArrayList<>();
 }

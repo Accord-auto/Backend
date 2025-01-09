@@ -2,26 +2,33 @@ package avto.accord.App.Domain.Services.ProductService;
 
 import avto.accord.App.Application.Facade.IProductFacade;
 import avto.accord.App.Application.Services.IProductService;
+import avto.accord.App.Domain.Models.Price.PriceResponse;
 import avto.accord.App.Domain.Models.Product.Product;
 import avto.accord.App.Domain.Models.Product.ProductRequest;
+import avto.accord.App.Domain.Models.Product.ProductResponse;
 import avto.accord.App.Domain.Models.Product.ProductSort;
 import avto.accord.App.Domain.Repositories.Product.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductService implements IProductService {
-    private final ProductRepository _productRepository;
+    @Autowired
+    private ProductRepository _productRepository;
     private final IProductFacade _productFacade;
 
     @Override
@@ -30,9 +37,40 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Page<Product> getAllProducts(int offset, int limit,ProductSort sort) {
+    public Page<ProductResponse> getAllProducts(int offset, int limit, ProductSort sort) {
         Pageable pageable = PageRequest.of(offset, limit, sort.getSortValue());
-        return _productRepository.findAll(pageable);
+        Page<Product> productPage = _productRepository.findAll(pageable);
+
+        return productPage.map(product -> {
+            List<ProductResponse.PropertyValue> propertyValues = product.getProperties().stream()
+                    .map(productProperty -> new ProductResponse.PropertyValue(
+                            productProperty.getProperty().getName(),
+                            productProperty.getValue()
+                    ))
+                    .collect(Collectors.toList());
+
+            PriceResponse priceResponse = new PriceResponse(
+                    product.getPrice().getValue(),
+                    product.getPrice().getDiscount()
+            );
+
+            return new ProductResponse(
+                    product.getId(),
+                    product.getName(),
+                    product.getBrand(),
+                    product.getCount(),
+                    priceResponse,
+                    product.getCountType(),
+                    product.getDescription(),
+                    product.getArticle(),
+                    product.isSpecialOffer(),
+                    product.getCustomerArticle(),
+                    product.getCategory().getName(),
+                    product.getMainPhotoUrl(),
+                    product.getAdditionalPhotos(),
+                    propertyValues
+            );
+        });
     }
 
     @Override
@@ -45,12 +83,21 @@ public class ProductService implements IProductService {
     public Product saveProduct(ProductRequest productRequest) throws IOException {
         try {
             Product product = _productFacade.createProduct(productRequest);
+            if (product.getAdditionalPhotos() == null) {
+                product.setAdditionalPhotos(new ArrayList<>());
+            }
+            if (product.getProperties() == null) {
+                product.setProperties(new ArrayList<>());
+            }
+
+            log.info("Saving product: {}", product.toString());
             return _productRepository.save(product);
         } catch (RuntimeException e) {
-            log.error("Error saving product: {}", e.getMessage(), e);
+            log.error("Error saving product: {}", e.getMessage());
             throw new RuntimeException("Error saving product", e);
         }
     }
+
     public Product saveProduct(Product product) {
         return _productRepository.save(product);
     }

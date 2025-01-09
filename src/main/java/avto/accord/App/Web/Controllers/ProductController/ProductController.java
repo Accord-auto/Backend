@@ -3,6 +3,7 @@ package avto.accord.App.Web.Controllers.ProductController;
 import avto.accord.App.Application.Services.IProductService;
 import avto.accord.App.Domain.Models.Product.Product;
 import avto.accord.App.Domain.Models.Product.ProductRequestPayload;
+import avto.accord.App.Domain.Models.Product.ProductResponse;
 import avto.accord.App.Domain.Models.Product.ProductSort;
 import avto.accord.App.Domain.Services.ProductRequestService.ProductRequestService;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,8 +24,8 @@ import java.util.List;
 @Slf4j
 @RestController
 @Tag(name = "товары")
-@RequiredArgsConstructor
 @RequestMapping("/products")
+@RequiredArgsConstructor
 public class ProductController {
     @Autowired
     private IProductService productService;
@@ -32,7 +33,7 @@ public class ProductController {
     private ProductRequestService productRequestService;
 
     @GetMapping
-    public Page<Product> getAllProducts(
+    public Page<ProductResponse> getAllProducts(
             @RequestParam(value = "offset") int offset,
             @RequestParam(value = "limit") int limit,
             @RequestParam(value = "sort", defaultValue = "ID_ASC") ProductSort sort
@@ -55,10 +56,8 @@ public class ProductController {
             @Parameter(description = "Product request payload", required = true, schema = @Schema(implementation = ProductRequestPayload.class))
             @RequestPart("productRequestPayload") String productRequestPayloadJson
     ) {
-        if (additionalPhotos.size() > 3) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("слишком много фотографий. максимум 3!");
-        }
         try {
+            log.info(productRequestPayloadJson);
             Product createdProduct = productRequestService.createProduct(mainPhoto, additionalPhotos, productRequestPayloadJson);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
         } catch (Exception e) {
@@ -66,7 +65,6 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ошибка при создании продукта");
         }
     }
-
 
     @PutMapping("/{id}/price")
     public ResponseEntity<Product> updateProductPrice(@PathVariable int id, @RequestBody int price) {

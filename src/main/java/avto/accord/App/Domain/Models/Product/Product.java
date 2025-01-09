@@ -10,11 +10,13 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class Product {
@@ -47,11 +49,11 @@ public class Product {
     @CollectionTable(name = "additional_photos", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "photo_path")
     @Size(max = 3)
-    private List<String> additionalPhotos;
+    private List<String> additionalPhotos  = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
-    private List<ProductProperty> properties;
+    private List<ProductProperty> properties  = new ArrayList<>();
 
     public Product(int id, String name, String brand, int count, String countType, String description, String article, String mainPhotoUrl, List<String> additionalPhotos, Category category, Price price, List<ProductProperty> properties) {
         this.id = id;
@@ -62,9 +64,9 @@ public class Product {
         this.description = description;
         this.article = article;
         this.mainPhotoUrl = mainPhotoUrl;
-        this.additionalPhotos = additionalPhotos;
+        this.additionalPhotos = additionalPhotos != null ? new ArrayList<>(additionalPhotos) : new ArrayList<>();
         this.category = category;
         this.price = price;
-        this.properties = properties;
+        this.properties = properties != null ? new ArrayList<>(properties) : new ArrayList<>();
     }
 }

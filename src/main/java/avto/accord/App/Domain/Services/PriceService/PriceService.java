@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 public class PriceService {
     @Autowired
     private final PriceRepository priceRepository;
-    // ? нужно ли еще чето
     public Price savePrice(Price request) {
         try {
             return priceRepository.save(request);
@@ -20,5 +19,4 @@ public class PriceService {
             throw e;
         }
     }
-
 }

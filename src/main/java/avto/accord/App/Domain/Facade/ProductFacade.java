@@ -14,7 +14,6 @@ import avto.accord.App.Domain.Models.ProductProperty.ProductPropertyRequest;
 import avto.accord.App.Domain.Models.Property.Property;
 import avto.accord.App.Infrastructure.Components.Photos.PhotoUtils;
 import avto.accord.App.Domain.Services.PriceService.PriceService;
-import avto.accord.App.Infrastructure.Components.Mapper.ProductPropertyMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -48,6 +48,25 @@ public class ProductFacade implements IProductFacade {
 
     @Override
     public Product createProduct(ProductRequest productRequest) throws IOException {
+        log.info("Creating product with request: {}", productRequest.toString());
+
+        // Validate input
+        if (productRequest.getName() == null || productRequest.getName().isEmpty()) {
+            throw new IllegalArgumentException("Product name cannot be null or empty");
+        }
+        if (productRequest.getBrand() == null || productRequest.getBrand().isEmpty()) {
+            throw new IllegalArgumentException("Product brand cannot be null or empty");
+        }
+        if (productRequest.getCount() <= 0) {
+            throw new IllegalArgumentException("Product count must be greater than zero");
+        }
+        if (productRequest.getCategoryId() <= 0) {
+            throw new IllegalArgumentException("Product category ID must be greater than zero");
+        }
+        if (productRequest.getPrice() == null) {
+            throw new IllegalArgumentException("Product price cannot be null");
+        }
+
         Product product = mapToProduct(productRequest);
 
         // Сохранение главного фото
@@ -76,6 +95,7 @@ public class ProductFacade implements IProductFacade {
         Price price = createPrice(productRequest.getPrice(), savedProduct);
         savedProduct.setPrice(price);
 
+        log.info("Product created successfully: {}", savedProduct.toString());
         return savedProduct;
     }
 
@@ -87,21 +107,37 @@ public class ProductFacade implements IProductFacade {
         product.setCountType(productRequest.getCountType());
         product.setDescription(productRequest.getDescription());
         product.setArticle(productRequest.getArticle());
+        product.setSpecialOffer(productRequest.isSpecialOffer());
+        product.setCustomerArticle(productRequest.getCustomerArticle());
+        product.setAdditionalPhotos(new ArrayList<>());
+        product.setProperties(new ArrayList<>());
+
+        Price price = new Price();
+        price.setValue(productRequest.getPrice().getValue());
+        price.setDiscount(productRequest.getPrice().getDiscount());
+        price.setProduct(product);
+        product.setPrice(price);
+
         return product;
     }
 
     private List<String> saveAdditionalPhotos(List<MultipartFile> additionalPhotos) throws IOException {
         List<String> additionalPhotoPaths = new ArrayList<>();
-        for (MultipartFile additionalPhoto : additionalPhotos) {
-            additionalPhotoPaths.add(savePhoto(additionalPhoto));
+        if (additionalPhotos != null) {
+            for (MultipartFile photo : additionalPhotos) {
+                additionalPhotoPaths.add(savePhoto(photo));
+            }
         }
         return additionalPhotoPaths;
     }
 
     private List<ProductProperty> mapProperties(List<ProductPropertyRequest> propertyRequests, Product product) {
+        if (propertyRequests == null) {
+            return new ArrayList<>();
+        }
         return propertyRequests.stream()
                 .map(propertyRequest -> mapPropertyRequestToProductProperty(propertyRequest, product))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     private ProductProperty mapPropertyRequestToProductProperty(ProductPropertyRequest propertyRequest, Product product) {
@@ -121,7 +157,8 @@ public class ProductFacade implements IProductFacade {
         }
 
         // Если значение не найдено, создаем новое
-        ProductProperty newProperty = ProductPropertyMapper.INSTANCE.toProductProperty(propertyRequest);
+        ProductProperty newProperty = new ProductProperty();
+        newProperty.setValue(propertyRequest.getValue());
         newProperty.setProperty(property);
         newProperty.setProduct(product);
         return newProperty;
