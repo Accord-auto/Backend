@@ -7,9 +7,10 @@ import avto.accord.App.Domain.Models.Product.ProductSort;
 import org.springframework.data.domain.Page;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface IProductService {
-    Product getSpecialOffer();
+    List<Product> getSpecialOffer();
     Page<ProductResponse> getAllProducts(int offset, int limit, ProductSort sort);
     Product getProductById(int productId);
     Product saveProduct(ProductRequest productRequest) throws IOException;

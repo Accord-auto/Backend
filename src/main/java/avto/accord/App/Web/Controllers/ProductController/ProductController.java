@@ -41,7 +41,7 @@ public class ProductController {
         return productService.getAllProducts(offset, limit, sort);
     }
     @GetMapping("/specialOffer")
-    public Product getSpecialOffer() {
+    public List<Product> getSpecialOffers() {
         return productService.getSpecialOffer();
     }
     @GetMapping("/{id}")

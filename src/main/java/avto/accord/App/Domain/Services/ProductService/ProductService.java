@@ -32,7 +32,7 @@ public class ProductService implements IProductService {
     private final IProductFacade _productFacade;
 
     @Override
-    public Product getSpecialOffer() {
+    public List<Product> getSpecialOffer() {
         return _productRepository.findRandomSpecialOfferProduct();
     }
 
