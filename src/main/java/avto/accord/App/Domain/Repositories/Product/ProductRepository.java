@@ -9,6 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface ProductRepository extends JpaRepository<Product, Integer> {
     Page<Product> findAllBy(Pageable pageable);
-    @Query("SELECT p FROM Product p WHERE p.specialOffer = true ORDER BY FUNCTION('RAND')")
+    @Query(value = "SELECT * FROM product p WHERE p.special_offer = true ORDER BY RAND() LIMIT 1", nativeQuery = true)
     Product findRandomSpecialOfferProduct();
 }
