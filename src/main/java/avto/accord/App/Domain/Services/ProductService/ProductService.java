@@ -87,6 +87,8 @@ public class ProductService implements IProductService {
             if (product.getAdditionalPhotos() == null) {
                 product.setAdditionalPhotos(new ArrayList<>());
             }
+            log.info("Props request"+productRequest.getProperties());
+            log.info("Props product: "+product.getProperties());
             if (product.getProperties() == null) {
                 product.setProperties(new ArrayList<>());
             }
@@ -151,4 +153,18 @@ public class ProductService implements IProductService {
         log.error("Product with ID {} not found", id);
         return null;
     }
+
+    /**
+     * @param id
+     */
+    @Override
+    public void toggleSpecialOffer(int id) {
+        try {
+            _productRepository.toggleSpecialOffer(id);
+        }catch (Exception e) {
+         log.error("Error toggle special offer", e);
+         throw new RuntimeException("Error toggle special offer", e);
+        }
+    }
+
 }

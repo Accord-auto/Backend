@@ -40,10 +40,12 @@ public class ProductController {
     ) {
         return productService.getAllProducts(offset, limit, sort);
     }
+
     @GetMapping("/specialOffer")
     public List<Product> getSpecialOffers() {
         return productService.getSpecialOffer();
     }
+
     @GetMapping("/{id}")
     public ProductResponse getProduct(@PathVariable int id) {
         return productService.getProductById(id);
@@ -105,6 +107,7 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+
     @PutMapping("/{id}/customerArticle")
     public ResponseEntity<Product> updateCustomerArticle(@PathVariable int id, @RequestBody String customerArticle) {
         Product updatedProduct = productService.updateCustomerArticle(id, customerArticle);
@@ -112,6 +115,16 @@ public class ProductController {
             return ResponseEntity.ok(updatedProduct);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @PutMapping(value = "/{id}/toggle-special-offer")
+    public ResponseEntity<?> toggleProductSpecialOffer(@PathVariable int id) {
+        try {
+            productService.toggleSpecialOffer(id);
+            return ResponseEntity.ok("Special offer toggled successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating special offer");
         }
     }
 }

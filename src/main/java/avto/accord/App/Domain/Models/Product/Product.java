@@ -33,6 +33,7 @@ public class Product {
     private Price price;
 
     private String countType;
+    @Column(nullable = false, length = 1000)
     private String description;
     private String article;
     private boolean specialOffer; // спецпредложение

@@ -13,4 +13,10 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     Page<Product> findAllBy(Pageable pageable);
     @Query(value = "SELECT * FROM product p WHERE p.special_offer = true", nativeQuery = true)
     List<Product> findRandomSpecialOfferProduct();
+
+    default void toggleSpecialOffer(int id) {
+        Product product = findById(id).orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        product.setSpecialOffer(!product.isSpecialOffer());
+        save(product);
+    }
 }

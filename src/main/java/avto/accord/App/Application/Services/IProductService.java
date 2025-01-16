@@ -20,4 +20,5 @@ public interface IProductService {
     Product updateDiscount(int productId, int newDiscount);
     Product updateCount(int productId, int newCount);
     Product updateCustomerArticle(int id, String customerArticle);
+    void toggleSpecialOffer(int id);
 }
