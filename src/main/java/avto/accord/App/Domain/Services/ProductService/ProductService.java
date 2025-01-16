@@ -41,42 +41,43 @@ public class ProductService implements IProductService {
         Pageable pageable = PageRequest.of(offset, limit, sort.getSortValue());
         Page<Product> productPage = _productRepository.findAll(pageable);
 
-        return productPage.map(product -> {
-            List<ProductResponse.PropertyValue> propertyValues = product.getProperties().stream()
-                    .map(productProperty -> new ProductResponse.PropertyValue(
-                            productProperty.getProperty().getName(),
-                            productProperty.getValue()
-                    ))
-                    .collect(Collectors.toList());
-
-            PriceResponse priceResponse = new PriceResponse(
-                    product.getPrice().getValue(),
-                    product.getPrice().getDiscount()
-            );
-
-            return new ProductResponse(
-                    product.getId(),
-                    product.getName(),
-                    product.getBrand(),
-                    product.getCount(),
-                    priceResponse,
-                    product.getCountType(),
-                    product.getDescription(),
-                    product.getArticle(),
-                    product.isSpecialOffer(),
-                    product.getCustomerArticle(),
-                    product.getCategory().getName(),
-                    product.getMainPhotoUrl(),
-                    product.getAdditionalPhotos(),
-                    propertyValues
-            );
-        });
+        return productPage.map(this::getProductResponse);
     }
 
     @Override
-    public Product getProductById(int productId) {
-        return _productRepository.findById(productId)
+    public ProductResponse getProductById(int productId) {
+        Product target = _productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        return getProductResponse(target);
+    }
+
+    private ProductResponse getProductResponse(Product target) {
+        List<ProductResponse.PropertyValue> propertyValues = target.getProperties().stream()
+                .map(productProperty -> new ProductResponse.PropertyValue(
+                        productProperty.getProperty().getName(),
+                        productProperty.getValue()
+                ))
+                .collect(Collectors.toList());
+        PriceResponse priceResponse = new PriceResponse(
+                target.getPrice().getValue(),
+                target.getPrice().getDiscount()
+        );
+        return new ProductResponse(
+                target.getId(),
+                target.getName(),
+                target.getBrand(),
+                target.getCount(),
+                priceResponse,
+                target.getCountType(),
+                target.getDescription(),
+                target.getArticle(),
+                target.isSpecialOffer(),
+                target.getCustomerArticle(),
+                target.getCategory().getName(),
+                target.getMainPhotoUrl(),
+                target.getAdditionalPhotos(),
+                propertyValues
+        );
     }
 
     @Override
@@ -116,7 +117,8 @@ public class ProductService implements IProductService {
     @Override
     @Transactional
     public Product updatePrice(int productId, int newPrice) {
-        Product product = getProductById(productId);
+        Product product =_productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
         product.getPrice().setValue(newPrice);
         return _productRepository.save(product);
     }
@@ -124,7 +126,8 @@ public class ProductService implements IProductService {
     @Override
     @Transactional
     public Product updateDiscount(int productId, int newDiscount) {
-        Product product = getProductById(productId);
+        Product product = _productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
         product.getPrice().setDiscount(newDiscount);
         return _productRepository.save(product);
     }
@@ -132,7 +135,8 @@ public class ProductService implements IProductService {
     @Override
     @Transactional
     public Product updateCount(int productId, int newCount) {
-        Product product = getProductById(productId);
+        Product product = _productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
         product.setCount(newCount);
         return _productRepository.save(product);
     }

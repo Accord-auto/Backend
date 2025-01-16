@@ -45,7 +45,7 @@ public class ProductController {
         return productService.getSpecialOffer();
     }
     @GetMapping("/{id}")
-    public Product getProduct(@PathVariable int id) {
+    public ProductResponse getProduct(@PathVariable int id) {
         return productService.getProductById(id);
     }
 

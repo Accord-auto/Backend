@@ -12,7 +12,7 @@ import java.util.List;
 public interface IProductService {
     List<Product> getSpecialOffer();
     Page<ProductResponse> getAllProducts(int offset, int limit, ProductSort sort);
-    Product getProductById(int productId);
+    ProductResponse getProductById(int productId);
     Product saveProduct(ProductRequest productRequest) throws IOException;
     Product saveProduct(Product product);
     boolean deleteProduct(int productId);
