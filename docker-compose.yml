@@ -26,7 +26,7 @@ services:
   backend:
     image: accord:latest
     build:
-      context: ./
+      context: ./Backend/
       args:
         DOCKER_BUILDKIT: 1
     ports:
