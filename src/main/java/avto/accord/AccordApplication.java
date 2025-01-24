@@ -20,7 +20,11 @@ public class AccordApplication implements CommandLineRunner {
      * @throws Exception
      */
     @Override
-    public void run(String... args) throws Exception {
-        storageService.init();
+    public void run(String... args) {
+        try {
+            storageService.init();
+        } catch (Exception e) {
+            System.err.println("Error initializing photo storage: " + e.getMessage());
+        }
     }
 }
