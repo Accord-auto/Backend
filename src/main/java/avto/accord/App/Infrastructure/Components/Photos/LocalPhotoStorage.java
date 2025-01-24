@@ -15,21 +15,18 @@ import java.util.stream.Stream;
 @Component
 public class LocalPhotoStorage implements PhotoStorage {
 
-    @Value("${photo.storage.path}")
-    private String photoStoragePath;
-
     private final Path root;
 
     public LocalPhotoStorage(@Value("${photo.storage.path}") String photoStoragePath) {
-        this.photoStoragePath = photoStoragePath;
         this.root = Paths.get(photoStoragePath);
+        init();
     }
     @Override
     public void init() {
         try {
-            Files.createDirectories(root);
-        }catch (IOException e){
-            throw new RuntimeException(e);
+            Files.createDirectories(root); // Создание директории, если она не существует
+        } catch (IOException e) {
+            throw new RuntimeException("Не удалось инициализировать хранилище", e);
         }
     }
     @Override
