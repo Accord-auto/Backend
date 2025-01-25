@@ -1,6 +1,5 @@
 package avto.accord.App.Domain.Models.Product;
 
-import avto.accord.App.Domain.Models.Price.Price;
 import avto.accord.App.Domain.Models.Price.PriceResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -9,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -20,6 +20,7 @@ public class ProductResponse {
     private String name;
     private String brand;
     private int count;
+
     @Schema(description = "цена товара")
     private PriceResponse price;
     private String countType;
@@ -30,14 +31,7 @@ public class ProductResponse {
     private String categoryName;
     private String mainPhotoUrl;
     private List<String> additionalPhotos;
-    private List<PropertyValue> properties;
 
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class PropertyValue {
-        private String name;
-        private String value;
-    }
+    // Обновленная структура для свойств
+    private Map<String, List<String>> properties; // Ключ - название
 }

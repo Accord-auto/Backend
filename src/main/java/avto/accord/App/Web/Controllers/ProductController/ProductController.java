@@ -1,6 +1,7 @@
 package avto.accord.App.Web.Controllers.ProductController;
 
 import avto.accord.App.Application.Services.IProductService;
+import avto.accord.App.Domain.Models.Page.CustomPage;
 import avto.accord.App.Domain.Models.Product.Product;
 import avto.accord.App.Domain.Models.Product.ProductRequestPayload;
 import avto.accord.App.Domain.Models.Product.ProductResponse;
@@ -35,7 +36,7 @@ public class ProductController {
     private ProductRequestService productRequestService;
 
     @GetMapping
-    public Page<ProductResponse> getAllProducts(
+    public CustomPage<ProductResponse> getAllProducts(
             @RequestParam(value = "offset") int offset,
             @RequestParam(value = "limit") int limit,
             @RequestParam(value = "sort", defaultValue = "ID_ASC") ProductSort sort
