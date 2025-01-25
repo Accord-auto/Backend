@@ -13,11 +13,13 @@ import avto.accord.App.Domain.Repositories.ProductProperty.ProductPropertyReposi
 import avto.accord.App.Domain.Repositories.Property.PropertyRepository;
 import avto.accord.App.Infrastructure.Exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PropertyService implements IPropertyService {
@@ -33,6 +35,11 @@ public class PropertyService implements IPropertyService {
     public PropertyDTO addPropertyValue(ProductPropertyRequest request) {
         Property property = propertyRepository.findById(request.getPropertyId())
                 .orElseThrow(() -> new ResourceNotFoundException("Property not found with id " + request.getPropertyId()));
+
+        // Проверка на уникальность значения свойства
+        if (findProductPropertyByPropertyIdAndValue(property.getId(), request.getValue()) != null) {
+            throw new IllegalArgumentException("Property value already exists for this property");
+        }
 
         ProductProperty productProperty = new ProductProperty();
         productProperty.setProperty(property);
@@ -50,7 +57,8 @@ public class PropertyService implements IPropertyService {
             newProperty.setName(property.getName());
             return propertyRepository.save(newProperty);
         } catch (Exception e) {
-            throw e;
+            log.error("Error saving property: {}", e.getMessage());
+            throw new RuntimeException("Failed to save property", e);
         }
     }
 
@@ -82,12 +90,19 @@ public class PropertyService implements IPropertyService {
 
     @Override
     public PropertyDTO deletePropertyValue(DeletePropertyValueRequest request) {
-        productPropertyRepository.deleteById(request.getIdValue());
+        ProductProperty productProperty = productPropertyRepository.findById(request.getIdValue())
+                .orElseThrow(() -> new ResourceNotFoundException("Product property not found with id " + request.getIdValue()));
+
+        productPropertyRepository.delete(productProperty);
         return getPropertyById(request.getIdCharacteristic());
     }
 
     @Override
     public void deleteProperty(int id) {
+        if (!propertyRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Cannot delete. Property not found with id " + id);
+        }
         propertyRepository.deleteById(id);
     }
 }
+

@@ -17,7 +17,7 @@ public class PhotoUtils {
     }
 
     public String savePhoto(MultipartFile photo) throws IOException {
-        String photoPath = UUID.randomUUID().toString() + getFileExtension(photo.getOriginalFilename());
+        String photoPath = UUID.randomUUID() + getFileExtension(photo.getOriginalFilename());
         photoStorage.savePhoto(photo, photoPath);
         return photoPath;
     }

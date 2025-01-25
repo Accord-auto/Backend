@@ -30,75 +30,117 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class ProductFacade implements IProductFacade {
-    @Autowired
-    private ICategoryService _categoryService;
-
-    @Autowired
-    private PhotoUtils photoUtils;
-
-    @Autowired
-    private IPropertyService _propertyService;
-
-    @Autowired
-    private PriceService _priceService;
-
-    @Autowired
+    private final ICategoryService categoryService;
+    private final PhotoUtils photoUtils;
+    private final IPropertyService propertyService;
+    private final PriceService priceService;
     @Lazy
+    @Autowired
     private IProductService productService;
 
     @Override
     public Product createProduct(ProductRequest productRequest) throws IOException {
-        log.info("Creating product with request: {}", productRequest.toString());
+        log.info("Creating product with request: {}", productRequest);
 
-        // Validate input
-        if (productRequest.getName() == null || productRequest.getName().isEmpty()) {
-            throw new IllegalArgumentException("Product name cannot be null or empty");
-        }
-        if (productRequest.getBrand() == null || productRequest.getBrand().isEmpty()) {
-            throw new IllegalArgumentException("Product brand cannot be null or empty");
-        }
-        if (productRequest.getCount() <= 0) {
-            throw new IllegalArgumentException("Product count must be greater than zero");
-        }
-        if (productRequest.getCategoryId() <= 0) {
-            throw new IllegalArgumentException("Product category ID must be greater than zero");
-        }
-        if (productRequest.getPrice() == null) {
-            throw new IllegalArgumentException("Product price cannot be null");
-        }
+        validateProductRequest(productRequest);
 
         Product product = mapToProduct(productRequest);
+        setPhotos(productRequest, product);
+        setCategory(productRequest, product);
+        setProperties(productRequest, product);
 
-        // Сохранение главного фото
+        // Сохранение продукта
+        Product savedProduct = productService.saveProduct(product);
+        setPrice(productRequest.getPrice(), savedProduct);
+
+        log.info("Product created successfully: {}", savedProduct);
+        return savedProduct;
+    }
+
+    private void setPhotos(ProductRequest productRequest, Product product) throws IOException {
         if (productRequest.getMainPhoto() != null) {
             String mainPhotoPath = savePhoto(productRequest.getMainPhoto());
             product.setMainPhotoUrl(mainPhotoPath);
         }
 
-        // Сохранение дополнительных фото
         if (productRequest.getAdditionalPhotos() != null) {
             List<String> additionalPhotoPaths = saveAdditionalPhotos(productRequest.getAdditionalPhotos());
             product.setAdditionalPhotos(additionalPhotoPaths);
         }
-
-        // Установка категории
-        Category category = _categoryService.getCategoryById(productRequest.getCategoryId());
-        product.setCategory(category);
-
-        // Установка свойств
-        product.setProperties(mapProperties(productRequest.getProperties(), product));
-
-        // Сохранение продукта
-        Product savedProduct = productService.saveProduct(product);
-
-        // Установка цены
-        Price price = createPrice(productRequest.getPrice(), savedProduct);
-        savedProduct.setPrice(price);
-
-        log.info("Product created successfully: {}", savedProduct.toString());
-        return savedProduct;
     }
 
+    private void setCategory(ProductRequest productRequest, Product product) {
+        Category category = categoryService.getCategoryById(productRequest.getCategoryId());
+        product.setCategory(category);
+    }
+
+    private void setProperties(ProductRequest productRequest, Product product) {
+        List<ProductProperty> properties = mapProperties(productRequest.getProperties(), product);
+        product.setProperties(properties);
+    }
+
+    private void setPrice(PriceRequest priceRequest, Product savedProduct) {
+        Price price = new Price();
+        price.setValue(priceRequest.getValue());
+        price.setDiscount(priceRequest.getDiscount());
+        price.setProduct(savedProduct);
+
+        try {
+            priceService.savePrice(price);
+            savedProduct.setPrice(price);  // Устанавливаем цену после успешного сохранения
+        } catch (Exception e) {
+            log.error("Error saving price for product {}: {}", savedProduct.getId(), e.getMessage());
+            throw new RuntimeException("Failed to save price", e);
+        }
+    }
+
+    private List<ProductProperty> mapProperties(List<ProductPropertyRequest> propertyRequests, Product product) {
+        if (propertyRequests == null) {
+            return new ArrayList<>();
+        }
+
+        return propertyRequests.stream()
+                .map(propertyRequest -> mapPropertyRequestToProductProperty(propertyRequest, product))
+                .collect(Collectors.toList());
+    }
+
+    private ProductProperty mapPropertyRequestToProductProperty(ProductPropertyRequest propertyRequest, Product product) {
+        Property property = propertyService.getPropertyByIdOnly(propertyRequest.getPropertyId());
+
+        // Проверяем существование значения свойства
+        ProductProperty existingProperty = propertyService.findProductPropertyByPropertyIdAndValue(
+                property.getId(),
+                propertyRequest.getValue()
+        );
+
+        if (existingProperty != null) {
+            existingProperty.setProduct(product); // Связываем с текущим продуктом
+            return existingProperty;
+        }
+
+        // Если значение не найдено, создаем новое
+        ProductProperty newProperty = new ProductProperty();
+        newProperty.setValue(propertyRequest.getValue());
+        newProperty.setProperty(property);
+        newProperty.setProduct(product);
+
+        // Сохраняем новое свойство в базе данных
+        return newProperty;
+    }
+
+    private String savePhoto(MultipartFile photo) throws IOException {
+        return photoUtils.savePhoto(photo);
+    }
+
+    private List<String> saveAdditionalPhotos(List<MultipartFile> additionalPhotos) throws IOException {
+        List<String> additionalPhotoPaths = new ArrayList<>();
+
+        for (MultipartFile photo : additionalPhotos) {
+            additionalPhotoPaths.add(savePhoto(photo));
+        }
+
+        return additionalPhotoPaths;
+    }
     private Product mapToProduct(ProductRequest productRequest) {
         Product product = new Product();
         product.setName(productRequest.getName());
@@ -121,59 +163,25 @@ public class ProductFacade implements IProductFacade {
         return product;
     }
 
-    private List<String> saveAdditionalPhotos(List<MultipartFile> additionalPhotos) throws IOException {
-        List<String> additionalPhotoPaths = new ArrayList<>();
-        if (additionalPhotos != null) {
-            for (MultipartFile photo : additionalPhotos) {
-                additionalPhotoPaths.add(savePhoto(photo));
-            }
-        }
-        return additionalPhotoPaths;
-    }
-
-    private List<ProductProperty> mapProperties(List<ProductPropertyRequest> propertyRequests, Product product) {
-        if (propertyRequests == null) {
-            return new ArrayList<>();
-        }
-        return propertyRequests.stream()
-                .map(propertyRequest -> mapPropertyRequestToProductProperty(propertyRequest, product))
-                .collect(Collectors.toList());
-    }
-
-    private ProductProperty mapPropertyRequestToProductProperty(ProductPropertyRequest propertyRequest, Product product) {
-        Property property = _propertyService.getPropertyByIdOnly(propertyRequest.getPropertyId());
-        if (property == null) {
-            throw new IllegalArgumentException("Property not found");
+    private void validateProductRequest(ProductRequest productRequest) {
+        if (productRequest.getName() == null || productRequest.getName().isEmpty()) {
+            throw new IllegalArgumentException("Product name cannot be null or empty");
         }
 
-        // Проверяем существование значения свойства
-        ProductProperty existingProperty = _propertyService.findProductPropertyByPropertyIdAndValue(
-                property.getId(),
-                propertyRequest.getValue()
-        );
-
-        if (existingProperty != null) {
-            return existingProperty;
+        if (productRequest.getBrand() == null || productRequest.getBrand().isEmpty()) {
+            throw new IllegalArgumentException("Product brand cannot be null or empty");
         }
 
-        // Если значение не найдено, создаем новое
-        ProductProperty newProperty = new ProductProperty();
-        newProperty.setValue(propertyRequest.getValue());
-        newProperty.setProperty(property);
-        newProperty.setProduct(product);
-        return newProperty;
-    }
+        if (productRequest.getCount() <= 0) {
+            throw new IllegalArgumentException("Product count must be greater than zero");
+        }
 
-    private String savePhoto(MultipartFile photo) throws IOException {
-        return photoUtils.savePhoto(photo);
-    }
+        if (productRequest.getCategoryId() <= 0) {
+            throw new IllegalArgumentException("Product category ID must be greater than zero");
+        }
 
-    private Price createPrice(PriceRequest priceRequest, Product product) {
-        Price price = new Price();
-        price.setProduct(product);
-        price.setDiscount(priceRequest.getDiscount());
-        price.setValue(priceRequest.getValue());
-        _priceService.savePrice(price);
-        return price;
+        if (productRequest.getPrice() == null) {
+            throw new IllegalArgumentException("Product price cannot be null");
+        }
     }
 }

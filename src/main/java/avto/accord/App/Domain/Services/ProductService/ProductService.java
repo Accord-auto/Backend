@@ -8,6 +8,7 @@ import avto.accord.App.Domain.Models.Product.ProductRequest;
 import avto.accord.App.Domain.Models.Product.ProductResponse;
 import avto.accord.App.Domain.Models.Product.ProductSort;
 import avto.accord.App.Domain.Repositories.Product.ProductRepository;
+import avto.accord.App.Infrastructure.Exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -46,13 +48,19 @@ public class ProductService implements IProductService {
 
     @Override
     public ProductResponse getProductById(int productId) {
+        log.info("Fetching product with ID: {}", productId);
+
         Product target = _productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productId));
+
         return getProductResponse(target);
     }
 
+
     private ProductResponse getProductResponse(Product target) {
-        List<ProductResponse.PropertyValue> propertyValues = target.getProperties().stream()
+        List<ProductResponse.PropertyValue> propertyValues = Optional.ofNullable(target.getProperties())
+                .orElse(Collections.emptyList())
+                .stream()
                 .map(productProperty -> new ProductResponse.PropertyValue(
                         productProperty.getProperty().getName(),
                         productProperty.getValue()
@@ -87,8 +95,6 @@ public class ProductService implements IProductService {
             if (product.getAdditionalPhotos() == null) {
                 product.setAdditionalPhotos(new ArrayList<>());
             }
-            log.info("Props request"+productRequest.getProperties());
-            log.info("Props product: "+product.getProperties());
             if (product.getProperties() == null) {
                 product.setProperties(new ArrayList<>());
             }

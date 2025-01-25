@@ -59,8 +59,7 @@ public class ArticleService implements IArticleService {
     public void deleteArticle(int id) {
         articleRepository.deleteById(id);
     }
-    public String savePhoto(MultipartFile photo) throws IOException {
+    private String savePhoto(MultipartFile photo) throws IOException {
         return photoUtils.savePhoto(photo);
     }
-
 }
