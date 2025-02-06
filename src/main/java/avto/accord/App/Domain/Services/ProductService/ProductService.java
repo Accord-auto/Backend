@@ -2,6 +2,7 @@ package avto.accord.App.Domain.Services.ProductService;
 
 import avto.accord.App.Application.Facade.IProductFacade;
 import avto.accord.App.Application.Services.IProductService;
+import avto.accord.App.Domain.Models.FilterRequest.ProductFilter;
 import avto.accord.App.Domain.Models.Page.CustomPage;
 import avto.accord.App.Domain.Models.Price.PriceResponse;
 import avto.accord.App.Domain.Models.Product.Product;
@@ -10,12 +11,10 @@ import avto.accord.App.Domain.Models.Product.ProductResponse;
 import avto.accord.App.Domain.Models.Product.ProductSort;
 import avto.accord.App.Domain.Repositories.Product.ProductRepository;
 import avto.accord.App.Infrastructure.Components.ProductSpecifications.ProductSpecifications;
-import avto.accord.App.Infrastructure.Exception.ProductNotFoundException;
 import avto.accord.App.Infrastructure.Exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +22,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.*;
 
 @Slf4j
@@ -47,25 +45,17 @@ public class ProductService implements IProductService {
 
     @Override
     public CustomPage<Product> filterProducts(
-            int categoryId,
-            Map<String, List<String>> properties,
-            BigDecimal minPrice,
-            BigDecimal maxPrice,
+            ProductFilter filter,
             int offset,
             int limit,
-            ProductSort sort
-    ) {
-
-        Specification<Product> spec = Specification.where(
-                        ProductSpecifications.hasCategory(categoryId))
-                .and(ProductSpecifications.hasProperties(properties))
-                .and(ProductSpecifications.priceBetween(minPrice, maxPrice));
+            ProductSort sort) {
 
         Pageable pageable = PageRequest.of(offset, limit, sort.getSortValue());
-
-        Page<Product> page = _productRepository.findAll(spec, pageable);
-        return new CustomPage<>(page);
+        Specification<Product> spec = ProductSpecifications.buildSpecification(filter);
+        Page<Product> productPage = _productRepository.findAll(spec, pageable);
+        return new CustomPage<>(productPage);
     }
+
 
     @Override
     public List<Product> getSpecialOffer() {

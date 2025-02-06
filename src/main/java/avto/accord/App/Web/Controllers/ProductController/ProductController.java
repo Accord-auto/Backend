@@ -1,7 +1,7 @@
 package avto.accord.App.Web.Controllers.ProductController;
 
 import avto.accord.App.Application.Services.IProductService;
-import avto.accord.App.Application.parameters.FilterProperties.FilterProperties;
+import avto.accord.App.Domain.Models.FilterRequest.ProductFilter;
 import avto.accord.App.Domain.Models.Page.CustomPage;
 import avto.accord.App.Domain.Models.Product.Product;
 import avto.accord.App.Domain.Models.Product.ProductRequestPayload;
@@ -19,14 +19,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -36,7 +37,24 @@ import java.util.Optional;
 public class ProductController {
     private final IProductService productService;
     private final ProductRequestService productRequestService;
+    @GetMapping("/filter")
+    public ResponseEntity<CustomPage<Product>> getFilteredProducts(
+            @RequestParam(required = false) Integer categoryId,
+            @RequestParam(required = false) Integer minPrice,
+            @RequestParam(required = false) Integer maxPrice,
+            @RequestParam(required = false) Map<String, String> properties,
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(defaultValue = "ID_ASC") ProductSort sort) {
 
+        ProductFilter filter = new ProductFilter();
+        filter.setCategoryId(categoryId);
+        filter.setMinPrice(minPrice);
+        filter.setMaxPrice(maxPrice);
+        filter.setProperties(convertProperties(properties));
+
+        return ResponseEntity.ok(productService.filterProducts(filter, offset, limit, sort));
+    }
     @GetMapping
     public CustomPage<ProductResponse> getAllProducts(
             @RequestParam(value = "offset") int offset,
@@ -46,34 +64,11 @@ public class ProductController {
         return productService.getAllProducts(offset, limit, sort);
     }
 
-    @GetMapping("/filter")
-    public ResponseEntity<CustomPage<Product>> filterProducts(
-            @RequestParam(required = false) Integer categoryId,
-            @RequestParam(required = false) FilterProperties filterProperties,
-            @RequestParam(required = false) BigDecimal minPrice,
-            @RequestParam(required = false) BigDecimal maxPrice,
-            @RequestParam(value = "offset", defaultValue = "0") int offset,
-            @RequestParam(value = "limit", defaultValue = "20") int limit,
-            @RequestParam(value = "sort", defaultValue = "ID_ASC") ProductSort sort) {
-        Map<String, List<String>> propertiesMap = filterProperties != null ? filterProperties.getProperties() : new HashMap<>();
-
-        CustomPage<Product> result = productService.filterProducts(
-                categoryId,
-                propertiesMap,
-                minPrice,
-                maxPrice,
-                offset,
-                limit,
-                sort
-        );
-
-        return ResponseEntity.ok(result);
-    }
-
     @GetMapping("/specialOffer")
     public List<Product> getBySpecialOffers() {
         return productService.getSpecialOffer();
     }
+
     @GetMapping("/article")
     public Product getByArticle(@RequestParam String article) {
         return productService.findByArticle(article)
@@ -184,5 +179,15 @@ public class ProductController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating special offer");
         }
+    }
+    private Map<String, List<String>> convertProperties(Map<String, String> properties) {
+        Map<String, List<String>> result = new HashMap<>();
+        if (properties != null) {
+            properties.forEach((key, value) -> {
+                List<String> values = Arrays.asList(value.split(","));
+                result.put(key, values);
+            });
+        }
+        return result;
     }
 }

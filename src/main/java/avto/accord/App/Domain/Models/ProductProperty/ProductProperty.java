@@ -11,6 +11,7 @@ import lombok.*;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+//значения
 public class ProductProperty {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

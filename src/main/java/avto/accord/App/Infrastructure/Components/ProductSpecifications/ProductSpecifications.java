@@ -1,5 +1,7 @@
 package avto.accord.App.Infrastructure.Components.ProductSpecifications;
 
+import avto.accord.App.Domain.Models.FilterRequest.ProductFilter;
+import avto.accord.App.Domain.Models.Price.Price;
 import avto.accord.App.Domain.Models.Product.Product;
 import avto.accord.App.Domain.Models.ProductProperty.ProductProperty;
 import avto.accord.App.Domain.Models.Property.Property;
@@ -15,68 +17,62 @@ import java.util.Map;
 
 
 /*
-* Класс для создания спецификаций поиска товаров.
-*/
+ * Класс для создания спецификаций поиска товаров.
+ */
 
 @Slf4j
 @Component
 public class ProductSpecifications {
-    /*
-    * Метод для создания спецификации поиска товаров по категории.
-    */
+
     public static Specification<Product> hasCategory(Integer categoryId) {
-        return (root, query, criteriaBuilder) ->
-                categoryId != null
-                        ? criteriaBuilder.equal(root.get("category").get("id"), categoryId)
-                        : criteriaBuilder.conjunction();
+        return (root, query, cb) ->
+                categoryId == null ? null : cb.equal(root.get("category").get("id"), categoryId);
     }
 
-    /*
-     * Метод для создания спецификации поиска товаров по заданным свойствам.
-    */
+    public static Specification<Product> priceBetween(Integer minPrice, Integer maxPrice) {
+        return (root, query, cb) -> {
+            if (minPrice == null && maxPrice == null) return null;
+            Join<Product, Price> priceJoin = root.join("price");
+
+            if (minPrice != null && maxPrice != null) {
+                return cb.between(priceJoin.get("value"), minPrice, maxPrice);
+            } else if (minPrice != null) {
+                return cb.greaterThanOrEqualTo(priceJoin.get("value"), minPrice);
+            } else {
+                return cb.lessThanOrEqualTo(priceJoin.get("value"), maxPrice);
+            }
+        };
+    }
+
     public static Specification<Product> hasProperties(Map<String, List<String>> properties) {
         return (root, query, cb) -> {
-            if (properties == null || properties.isEmpty()) {
-                return cb.conjunction(); // Если фильтров нет, возвращаем пустое условие
-            }
+            if (properties == null || properties.isEmpty()) return cb.conjunction();
 
             List<Predicate> predicates = new ArrayList<>();
             for (Map.Entry<String, List<String>> entry : properties.entrySet()) {
-                String propName = entry.getKey();
-                List<String> propValues = entry.getValue();
-
-                Subquery<Integer> subquery = query.subquery(Integer.class);
-                Root<ProductProperty> pp = subquery.from(ProductProperty.class);
-                Join<ProductProperty, Property> propJoin = pp.join("property");
-                subquery.select(pp.get("product").get("id"))
-                        .where(
-                                cb.and(
-                                        cb.equal(propJoin.get("name"), propName), // Фильтр по имени свойства
-                                        pp.get("value").in(propValues)           // Фильтр по значениям свойства
-                                )
-                        );
-                predicates.add(cb.in(root.get("id")).value(subquery));
+                String propertyName = entry.getKey();
+                List<String> propertyValues = entry.getValue();
+                List<Predicate> valuePredicates = new ArrayList<>();
+                for (String value : propertyValues) {
+                    Subquery<ProductProperty> subquery = query.subquery(ProductProperty.class);
+                    Root<ProductProperty> ppRoot = subquery.from(ProductProperty.class);
+                    subquery.select(ppRoot)
+                            .where(
+                                    cb.equal(ppRoot.get("product"), root),
+                                    cb.equal(ppRoot.get("property").get("name"), propertyName),
+                                    cb.equal(ppRoot.get("value"), value)
+                            );
+                    valuePredicates.add(cb.exists(subquery));
+                }
+                predicates.add(cb.and(valuePredicates.toArray(new Predicate[0])));
             }
-            query.distinct(true); // Убираем дубликаты
-            return cb.and(predicates.toArray(new Predicate[0])); // Объединяем все условия через AND
+            return cb.and(predicates.toArray(new Predicate[0]));
         };
     }
-
-    /*
-     * Метод для создания спецификации поиска товаров по диапазону цен.
-    */
-    public static Specification<Product> priceBetween(BigDecimal min, BigDecimal max) {
-        return (root, query, criteriaBuilder) -> {
-            if (min == null && max == null) return criteriaBuilder.conjunction();
-            Path<BigDecimal> pricePath = root.get("price").get("value");
-
-            if (min != null && max != null) {
-                return criteriaBuilder.between(pricePath, min, max);
-            } else if (min != null) {
-                return criteriaBuilder.greaterThanOrEqualTo(pricePath, min);
-            } else {
-                return criteriaBuilder.lessThanOrEqualTo(pricePath, max);
-            }
-        };
+    
+    public static Specification<Product> buildSpecification(ProductFilter filter) {
+        return Specification.where(hasCategory(filter.getCategoryId()))
+                .and(priceBetween(filter.getMinPrice(), filter.getMaxPrice()))
+                .and(hasProperties(filter.getProperties()));
     }
 }

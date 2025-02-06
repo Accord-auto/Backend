@@ -16,6 +16,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+//каталог характеристик
 public class Property {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

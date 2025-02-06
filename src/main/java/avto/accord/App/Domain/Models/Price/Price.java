@@ -2,6 +2,7 @@ package avto.accord.App.Domain.Models.Price;
 
 import avto.accord.App.Domain.Models.Product.Product;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,6 +11,7 @@ import lombok.*;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Price {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
