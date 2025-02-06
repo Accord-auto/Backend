@@ -8,7 +8,6 @@ import lombok.*;
 @Getter
 @Setter
 @Entity
-@Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
 public class Price {

@@ -9,6 +9,8 @@ import avto.accord.App.Domain.Models.Product.ProductRequest;
 import avto.accord.App.Domain.Models.Product.ProductResponse;
 import avto.accord.App.Domain.Models.Product.ProductSort;
 import avto.accord.App.Domain.Repositories.Product.ProductRepository;
+import avto.accord.App.Infrastructure.Components.ProductSpecifications.ProductSpecifications;
+import avto.accord.App.Infrastructure.Exception.ProductNotFoundException;
 import avto.accord.App.Infrastructure.Exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -17,21 +19,53 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedModel;
-import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductService implements IProductService {
-    @Autowired
-    private ProductRepository _productRepository;
+
+    private final ProductRepository _productRepository;
     private final IProductFacade _productFacade;
+
+
+    @Override
+    public Optional<Product> findByArticle(String article) {
+        return _productRepository.findByArticle(article);
+    }
+
+    @Override
+    public Optional<Product> findByCustomerArticle(String customerArticle) {
+        return _productRepository.findByCustomerArticle(customerArticle);
+    }
+
+    @Override
+    public CustomPage<Product> filterProducts(
+            int categoryId,
+            Map<String, List<String>> properties,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            int offset,
+            int limit,
+            ProductSort sort
+    ) {
+
+        Specification<Product> spec = Specification.where(
+                        ProductSpecifications.hasCategory(categoryId))
+                .and(ProductSpecifications.hasProperties(properties))
+                .and(ProductSpecifications.priceBetween(minPrice, maxPrice));
+
+        Pageable pageable = PageRequest.of(offset, limit, sort.getSortValue());
+
+        Page<Product> page = _productRepository.findAll(spec, pageable);
+        return new CustomPage<>(page);
+    }
 
     @Override
     public List<Product> getSpecialOffer() {
@@ -100,7 +134,7 @@ public class ProductService implements IProductService {
                 product.setProperties(new ArrayList<>());
             }
 
-            log.info("Saving product: {}", product.toString());
+            log.info("Saving product: {}", product);
             return _productRepository.save(product);
         } catch (RuntimeException e) {
             log.error("Error saving product: {}", e.getMessage());
@@ -163,9 +197,6 @@ public class ProductService implements IProductService {
         return null;
     }
 
-    /**
-     * @param id
-     */
     @Override
     public void toggleSpecialOffer(int id) {
         try {

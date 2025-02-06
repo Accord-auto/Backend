@@ -31,7 +31,5 @@ public class ProductResponse {
     private String categoryName;
     private String mainPhotoUrl;
     private List<String> additionalPhotos;
-
-    // Обновленная структура для свойств
     private Map<String, List<String>> properties; // Ключ - название
 }

@@ -6,7 +6,6 @@ import avto.accord.App.Web.Controllers.PhotoContoller.PhotoController;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,7 +26,7 @@ public class PhotoService {
     public void savePhoto(MultipartFile file, String fileName) {
         photoStorage.savePhoto(file, fileName);
     }
-    @Cacheable(value = "photos", key = "#photoname")
+
     public Resource getPhoto(String photoname) throws IOException {
         return photoStorage.loadPhoto(photoname);
     }

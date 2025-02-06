@@ -1,6 +1,7 @@
 package avto.accord.App.Web.Controllers.ProductController;
 
 import avto.accord.App.Application.Services.IProductService;
+import avto.accord.App.Application.parameters.FilterProperties.FilterProperties;
 import avto.accord.App.Domain.Models.Page.CustomPage;
 import avto.accord.App.Domain.Models.Product.Product;
 import avto.accord.App.Domain.Models.Product.ProductRequestPayload;
@@ -8,21 +9,24 @@ import avto.accord.App.Domain.Models.Product.ProductResponse;
 import avto.accord.App.Domain.Models.Product.ProductSort;
 import avto.accord.App.Domain.Services.ProductRequestService.ProductRequestService;
 import avto.accord.App.Infrastructure.Exception.ErrorResponse;
+import avto.accord.App.Infrastructure.Exception.ProductNotFoundException;
 import avto.accord.App.Infrastructure.Exception.ResourceNotFoundException;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -30,10 +34,8 @@ import java.util.List;
 @RequestMapping("/products")
 @RequiredArgsConstructor
 public class ProductController {
-    @Autowired
-    private IProductService productService;
-    @Autowired
-    private ProductRequestService productRequestService;
+    private final IProductService productService;
+    private final ProductRequestService productRequestService;
 
     @GetMapping
     public CustomPage<ProductResponse> getAllProducts(
@@ -44,9 +46,44 @@ public class ProductController {
         return productService.getAllProducts(offset, limit, sort);
     }
 
+    @GetMapping("/filter")
+    public ResponseEntity<CustomPage<Product>> filterProducts(
+            @RequestParam(required = false) Integer categoryId,
+            @RequestParam(required = false) FilterProperties filterProperties,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "limit", defaultValue = "20") int limit,
+            @RequestParam(value = "sort", defaultValue = "ID_ASC") ProductSort sort) {
+        Map<String, List<String>> propertiesMap = filterProperties != null ? filterProperties.getProperties() : new HashMap<>();
+
+        CustomPage<Product> result = productService.filterProducts(
+                categoryId,
+                propertiesMap,
+                minPrice,
+                maxPrice,
+                offset,
+                limit,
+                sort
+        );
+
+        return ResponseEntity.ok(result);
+    }
+
     @GetMapping("/specialOffer")
-    public List<Product> getSpecialOffers() {
+    public List<Product> getBySpecialOffers() {
         return productService.getSpecialOffer();
+    }
+    @GetMapping("/article")
+    public Product getByArticle(@RequestParam String article) {
+        return productService.findByArticle(article)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found by article"));
+    }
+
+    @GetMapping("/customerArticle")
+    public Product getByCustomerArticle(@RequestParam String customerArticle) {
+        return productService.findByCustomerArticle(customerArticle)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found by customer article"));
     }
 
     @GetMapping("/{id}")

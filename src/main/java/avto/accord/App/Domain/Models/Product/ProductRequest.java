@@ -10,21 +10,20 @@ import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-@ToString
+@AllArgsConstructor
 public class ProductRequest {
     private String name;
     private String brand;
     private int count;
-    private PriceRequest price;
     private String countType;
     private String description;
     private String article;
+    private boolean specialOffer;
+    private String customerArticle;
+    private PriceRequest price;
     private MultipartFile mainPhoto;
     private List<MultipartFile> additionalPhotos = new ArrayList<>();
     private int categoryId;
     private List<ProductPropertyRequest> properties = new ArrayList<>();
-    private boolean specialOffer;
-    private String customerArticle;
 }

@@ -16,6 +16,8 @@ public class CustomPage<T> {
     private List<T> content;
     private int totalPages;
     private long totalElements;
+    private int currentPage;
+    private int pageSize;
 
     public CustomPage(Page<T> page) {
         this.content = page.getContent();
