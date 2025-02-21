@@ -44,7 +44,7 @@ public class ProductController {
             @RequestParam(required = false) Integer maxPrice,
             @RequestParam(required = false) Map<String, String> properties,
             @RequestParam(defaultValue = "0") int offset,
-            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(defaultValue = "20") int limit,
             @RequestParam(defaultValue = "ID_ASC") ProductSort sort) {
 
         ProductFilter filter = new ProductFilter();
