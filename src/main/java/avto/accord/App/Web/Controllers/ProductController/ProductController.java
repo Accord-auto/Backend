@@ -23,10 +23,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -39,19 +36,28 @@ public class ProductController {
     private final ProductRequestService productRequestService;
     @GetMapping("/filter")
     public ResponseEntity<CustomPage<Product>> getFilteredProducts(
-            @RequestParam(required = false) Integer categoryId,
+            @RequestParam(required = false) List<Integer> categoryIds,
+            @RequestParam(required = false) List<String> brands,
             @RequestParam(required = false) Integer minPrice,
             @RequestParam(required = false) Integer maxPrice,
-            @RequestParam(required = false) Map<String, String> properties,
+            @RequestParam MultiValueMap<String, String> allParams,
             @RequestParam(defaultValue = "0") int offset,
             @RequestParam(defaultValue = "20") int limit,
             @RequestParam(defaultValue = "ID_ASC") ProductSort sort) {
 
+        Map<String, String> properties = allParams.entrySet().stream()
+                .filter(e -> !isReservedParam(e.getKey()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> e.getValue().get(0))
+                );
+
         ProductFilter filter = new ProductFilter();
-        filter.setCategoryId(categoryId);
+        filter.setCategoryIds(categoryIds);
+        filter.setBrands(brands);
         filter.setMinPrice(minPrice);
         filter.setMaxPrice(maxPrice);
-        filter.setProperties(convertProperties(properties));
+        filter.setProperties(properties);
 
         return ResponseEntity.ok(productService.filterProducts(filter, offset, limit, sort));
     }
@@ -180,14 +186,7 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating special offer");
         }
     }
-    private Map<String, List<String>> convertProperties(Map<String, String> properties) {
-        Map<String, List<String>> result = new HashMap<>();
-        if (properties != null) {
-            properties.forEach((key, value) -> {
-                List<String> values = Arrays.asList(value.split(","));
-                result.put(key, values);
-            });
-        }
-        return result;
+    private boolean isReservedParam(String param) {
+        return Set.of("categoryIds", "brands", "minPrice", "maxPrice").contains(param);
     }
 }

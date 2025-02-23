@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Map;
 @Getter
 @Setter
-@ToString
 public class ProductFilter {
-    private Integer categoryId;
+    private List<Integer> categoryIds;
+    private List<String> brands;
     private Integer minPrice;
     private Integer maxPrice;
-    private Map<String, List<String>> properties = new HashMap<>();
+    private Map<String, String> properties = new HashMap<>();
 }

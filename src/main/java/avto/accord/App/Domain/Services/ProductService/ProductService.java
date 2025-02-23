@@ -51,7 +51,21 @@ public class ProductService implements IProductService {
             ProductSort sort) {
 
         Pageable pageable = PageRequest.of(offset, limit, sort.getSortValue());
-        Specification<Product> spec = ProductSpecifications.buildSpecification(filter);
+        Specification<Product> spec = Specification.where(null);
+
+        if (filter.getCategoryIds() != null && !filter.getCategoryIds().isEmpty())
+            spec = spec.and(ProductSpecifications.inCategories(filter.getCategoryIds()));
+
+        if (filter.getBrands() != null && !filter.getBrands().isEmpty())
+            spec = spec.and(ProductSpecifications.hasBrands(filter.getBrands()));
+
+        if (filter.getMinPrice() != null || filter.getMaxPrice() != null)
+            spec = spec.and(ProductSpecifications.hasPriceBetween(
+                    filter.getMinPrice(), filter.getMaxPrice()));
+
+        if (filter.getProperties() != null && !filter.getProperties().isEmpty())
+            spec = spec.and(ProductSpecifications.hasProperties(filter.getProperties()));
+
         Page<Product> productPage = _productRepository.findAll(spec, pageable);
         return new CustomPage<>(productPage);
     }

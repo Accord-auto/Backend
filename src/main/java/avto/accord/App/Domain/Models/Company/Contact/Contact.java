@@ -1,6 +1,7 @@
 package avto.accord.App.Domain.Models.Company.Contact;
 
 import avto.accord.App.Domain.Models.Company.Company;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,6 +23,7 @@ public class Contact {
 
     @ManyToOne
     @JoinColumn(name = "company_id", nullable = false)
+    @JsonBackReference
     private Company company;
 
     public Contact(String phoneNumber, String email) {
