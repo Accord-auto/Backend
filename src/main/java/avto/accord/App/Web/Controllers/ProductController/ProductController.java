@@ -45,11 +45,11 @@ public class ProductController {
             @RequestParam(defaultValue = "20") int limit,
             @RequestParam(defaultValue = "ID_ASC") ProductSort sort) {
 
-        Map<String, String> properties = allParams.entrySet().stream()
+        Map<String, List<String>> properties = allParams.entrySet().stream()
                 .filter(e -> !isReservedParam(e.getKey()))
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        e -> e.getValue().get(0))
+                        Map.Entry::getValue)
                 );
 
         ProductFilter filter = new ProductFilter();

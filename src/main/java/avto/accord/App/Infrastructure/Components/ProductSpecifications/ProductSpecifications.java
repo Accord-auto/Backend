@@ -52,12 +52,15 @@ public class ProductSpecifications {
         };
     }
 
-    public static Specification<Product> hasProperties(Map<String, String> properties) {
+    public static Specification<Product> hasProperties(Map<String, List<String>> properties) {
         return (root, query, cb) -> {
             if (properties == null || properties.isEmpty()) return cb.conjunction();
 
             List<Predicate> predicates = new ArrayList<>();
-            for (Map.Entry<String, String> entry : properties.entrySet()) {
+            for (Map.Entry<String, List<String>> entry : properties.entrySet()) {
+                String propertyName = entry.getKey();
+                List<String> propertyValues = entry.getValue();
+
                 Subquery<ProductProperty> sq = query.subquery(ProductProperty.class);
                 Root<ProductProperty> pp = sq.from(ProductProperty.class);
                 Join<ProductProperty, Property> prop = pp.join("property");
@@ -65,8 +68,8 @@ public class ProductSpecifications {
                 sq.select(pp.get("product").get("id"))
                         .where(
                                 cb.and(
-                                        cb.equal(prop.get("name"), entry.getKey()),
-                                        cb.equal(pp.get("value"), entry.getValue()),
+                                        cb.equal(prop.get("name"), propertyName),
+                                        pp.get("value").in(propertyValues),
                                         cb.equal(pp.get("product").get("id"), root.get("id"))
                                 )
                         );

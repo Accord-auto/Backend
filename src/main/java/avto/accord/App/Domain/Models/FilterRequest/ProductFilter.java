@@ -14,5 +14,5 @@ public class ProductFilter {
     private List<String> brands;
     private Integer minPrice;
     private Integer maxPrice;
-    private Map<String, String> properties = new HashMap<>();
+    private Map<String, List<String>> properties = new HashMap<>();
 }
