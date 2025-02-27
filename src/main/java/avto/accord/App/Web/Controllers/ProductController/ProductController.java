@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 public class ProductController {
     private final IProductService productService;
     private final ProductRequestService productRequestService;
+
     @GetMapping("/filter")
     public ResponseEntity<CustomPage<Product>> getFilteredProducts(
             @RequestParam(required = false) List<Integer> categoryIds,

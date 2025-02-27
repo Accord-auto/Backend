@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -32,6 +33,14 @@ public class ProductService implements IProductService {
     private final ProductRepository _productRepository;
     private final IProductFacade _productFacade;
 
+
+    /**
+     * @return
+     */
+    @Override
+    public List<String> getBrands() {
+        return _productRepository.findAll().stream().map(Product::getBrand).distinct().toList();
+    }
 
     @Override
     public Optional<Product> findByArticle(String article) {

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IProductService {
+    List<String> getBrands();
     Optional<Product> findByArticle(String article);
 
     Optional<Product> findByCustomerArticle(String customerArticle);
