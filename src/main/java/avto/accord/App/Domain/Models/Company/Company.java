@@ -2,9 +2,9 @@ package avto.accord.App.Domain.Models.Company;
 
 import avto.accord.App.Domain.Models.Company.Adress.Address;
 import avto.accord.App.Domain.Models.Company.Contact.Contact;
+import avto.accord.App.Domain.Models.Company.TypeCompany.TypeCompany;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +12,9 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Company {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,4 +28,6 @@ public class Company {
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Contact> contacts = new ArrayList<>();
+
+    private TypeCompany typeCompany;
 }

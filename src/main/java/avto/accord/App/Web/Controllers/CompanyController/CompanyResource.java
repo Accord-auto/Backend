@@ -19,13 +19,24 @@ import java.util.List;
 public class CompanyResource {
 
     private final CompanyService companyService;
+
     @GetMapping("/{id}")
     public Company getOne(@PathVariable Integer id) {
         return companyService.getOne(id);
     }
 
+    @GetMapping("/header")
+    public Company getHeader() {
+        return companyService.getHeaderCompany();
+    }
+
+    @GetMapping("/departments")
+    public List<Company> getDepartments() {
+        return companyService.getAllDepartments();
+    }
+
     @PostMapping
-    public Company create(@RequestBody Company company) {
+    public Company create(@RequestBody CompanyDto company) {
         return companyService.create(company);
     }
 
