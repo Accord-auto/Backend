@@ -1,6 +1,7 @@
 package avto.accord.App.Domain.Models.Company.Contact;
 
 import avto.accord.App.Domain.Models.Company.Company;
+import avto.accord.App.Domain.Models.Company.SocialURLs.SocialURLs;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,9 +24,9 @@ public class Contact {
     @Column(unique = true, nullable = true)
     private String email;
 
-    @ElementCollection
-    @Column(nullable = true)
-    private List<String> SocialURLs = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "contact_id")
+    private List<SocialURLs> socialURLs = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "company_id", nullable = false)

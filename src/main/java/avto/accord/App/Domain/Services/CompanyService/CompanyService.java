@@ -5,6 +5,7 @@ import avto.accord.App.Domain.Models.Company.Company;
 import avto.accord.App.Domain.Models.Company.CompanyDto;
 import avto.accord.App.Domain.Models.Company.Contact.Contact;
 import avto.accord.App.Domain.Models.Company.Contact.ContactDto;
+import avto.accord.App.Domain.Models.Company.SocialURLs.SocialURLs;
 import avto.accord.App.Domain.Models.Company.TypeCompany.TypeCompany;
 import avto.accord.App.Domain.Repositories.Address.AddressRepository;
 import avto.accord.App.Domain.Repositories.Company.CompanyRepository;
@@ -69,7 +70,18 @@ public class CompanyService {
                     .email(contactDto.getEmail())
                     .company(company)
                     .build();
-            contact.setSocialURLs(contactDto.getSocialURLs());
+
+            List<SocialURLs> socialURLs = contactDto.getSocialURLs().stream()
+                    .map(socialURLsDto -> {
+                        SocialURLs socialURL = new SocialURLs();
+                        socialURL.setType(socialURLsDto.getType());
+                        socialURL.setUrl(socialURLsDto.getUrl());
+                        socialURL.setContact(contact);
+                        return socialURL;
+                    })
+                    .collect(Collectors.toList());
+
+            contact.setSocialURLs(socialURLs);
             contacts.add(contact);
         }
         company.setContacts(contacts);

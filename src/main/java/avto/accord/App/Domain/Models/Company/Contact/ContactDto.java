@@ -1,5 +1,6 @@
 package avto.accord.App.Domain.Models.Company.Contact;
 
+import avto.accord.App.Domain.Models.Company.SocialURLs.SocialURLsDto;
 import lombok.Value;
 
 import java.util.ArrayList;
@@ -12,5 +13,5 @@ import java.util.List;
 public class ContactDto {
     String phoneNumber;
     String email;
-    List<String> SocialURLs = new ArrayList<>();
+    List<SocialURLsDto> socialURLs = new ArrayList<>();
 }
