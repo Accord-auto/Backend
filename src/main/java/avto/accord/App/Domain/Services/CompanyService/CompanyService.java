@@ -37,10 +37,9 @@ public class CompanyService {
         return companyRepository.findAllByTypeCompany(TypeCompany.DEPARTMENT);
     }
 
-    // Метод для получения основной компании (HEADER)
-    public Company getHeaderCompany() {
-        return companyRepository.findByTypeCompany(TypeCompany.HEADER).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"not found"));
+    // Метод для получения основных компаний (HEADER)
+    public List<Company> getHeaderCompany() {
+        return companyRepository.findAllByTypeCompany(TypeCompany.HEADER);
     }
 
     public Company getOne(Integer id) {

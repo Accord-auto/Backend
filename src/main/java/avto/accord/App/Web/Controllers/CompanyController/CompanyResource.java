@@ -26,7 +26,7 @@ public class CompanyResource {
     }
 
     @GetMapping("/header")
-    public Company getHeader() {
+    public List<Company> getHeader() {
         return companyService.getHeaderCompany();
     }
 
