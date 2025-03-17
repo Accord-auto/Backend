@@ -12,8 +12,7 @@ public class GeoNamesResponse {
     public static class GeoName {
         private String name;
         private String countryName;
-        private String adminName1; // Region/State
-        private String lat;
-        private String lng;
-    }
+        private String adminName1; // Region/State name
+        private String adminCode1; // Region/State code
+     }
 }

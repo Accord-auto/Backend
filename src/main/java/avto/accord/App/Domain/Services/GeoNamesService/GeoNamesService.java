@@ -20,15 +20,29 @@ public class GeoNamesService {
         this.restTemplate = restTemplate;
     }
 
-    public GeoNamesResponse searchCities(int startRow, int maxRows) {
-        // Коды стран СНГ
-        String cngCountries = "RU,BY,UA,KZ,UZ,AZ,AM,KG,TJ,TM,MD";
+    public GeoNamesResponse getRussianRegions(int startRow, int maxRows) {
         String url = UriComponentsBuilder.fromHttpUrl(GEONAMES_API_URL)
                 .queryParam("startRow", startRow)
                 .queryParam("maxRows", maxRows)
                 .queryParam("username", USERNAME)
-                .queryParam("featureClass", "P") // Только города
-                .queryParam("country", cngCountries) // Ограничение по странам СНГ
+                .queryParam("country", "RU")
+                .queryParam("featureCode", "ADM1") // Административные регионы первого уровня
+                .queryParam("style", "FULL")
+                .toUriString();
+
+        return restTemplate.getForObject(url, GeoNamesResponse.class);
+    }
+
+    public GeoNamesResponse getCitiesByRegion(String regionId, int startRow, int maxRows) {
+        String url = UriComponentsBuilder.fromHttpUrl(GEONAMES_API_URL)
+                .queryParam("startRow", startRow)
+                .queryParam("maxRows", maxRows)
+                .queryParam("username", USERNAME)
+                .queryParam("country", "RU")
+                .queryParam("featureClass", "P")
+                .queryParam("style", "FULL")
+                .queryParam("cities", "cities15000")
+                .queryParam("adminCode1", regionId) // Фильтрация по коду региона
                 .toUriString();
 
         return restTemplate.getForObject(url, GeoNamesResponse.class);
