@@ -28,6 +28,7 @@ public class GeoNamesService {
                 .queryParam("country", "RU")
                 .queryParam("featureCode", "ADM1") // Административные регионы первого уровня
                 .queryParam("style", "FULL")
+                .queryParam("lang", "ru")
                 .toUriString();
 
         return restTemplate.getForObject(url, GeoNamesResponse.class);
@@ -43,6 +44,7 @@ public class GeoNamesService {
                 .queryParam("style", "FULL")
                 .queryParam("cities", "cities15000")
                 .queryParam("adminCode1", regionId) // Фильтрация по коду региона
+                .queryParam("lang", "ru")
                 .toUriString();
 
         return restTemplate.getForObject(url, GeoNamesResponse.class);
