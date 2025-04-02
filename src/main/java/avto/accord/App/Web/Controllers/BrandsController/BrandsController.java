@@ -1,6 +1,7 @@
 package avto.accord.App.Web.Controllers.BrandsController;
 
 import avto.accord.App.Application.Services.IProductService;
+import avto.accord.App.Infrastructure.Annotations.PublicEndpoint.PublicEndpoint;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import java.util.List;
 public class BrandsController {
     private final IProductService productService;
     @GetMapping
+    @PublicEndpoint
     public List<String> getAllBrands() {
         try {
             return productService.getBrands();

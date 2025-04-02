@@ -2,6 +2,7 @@ package avto.accord.App.Web.Controllers.PriceController;
 
 import avto.accord.App.Domain.Models.Price.Price;
 import avto.accord.App.Domain.Services.PriceService.PriceService;
+import avto.accord.App.Infrastructure.Annotations.PublicEndpoint.PublicEndpoint;
 import avto.accord.App.Infrastructure.Exception.ProductNotFoundException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PriceController {
     private final PriceService priceService;
     @GetMapping("/max-price" )
+    @PublicEndpoint
     public Price getMaxPrice() {
         return priceService.getMaxPrice().orElseThrow(() -> new ExpressionException("max price not found!"));
     }

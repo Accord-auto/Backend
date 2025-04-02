@@ -2,6 +2,7 @@ package avto.accord.App.Web.Controllers.PhotoContoller;
 
 import avto.accord.App.Domain.Models.FileInfo.FileInfo;
 import avto.accord.App.Domain.Services.PhotoService.PhotoService;
+import avto.accord.App.Infrastructure.Annotations.PublicEndpoint.PublicEndpoint;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -27,11 +28,13 @@ public class PhotoController {
     private PhotoService photoService;
 
     @GetMapping("/")
+    @PublicEndpoint
     public ResponseEntity<List<FileInfo>> getListPhotos() {
         return ResponseEntity.status(HttpStatus.OK).body(photoService.getPhotos());
     }
 
     @GetMapping("/{photoname}")
+    @PublicEndpoint
     public ResponseEntity<Resource> getPhoto(@PathVariable String photoname) {
         try {
             Resource photo = photoService.getPhoto(photoname);
@@ -46,6 +49,7 @@ public class PhotoController {
     }
 
     @GetMapping
+    @PublicEndpoint
     public void getPhotos(@RequestParam List<String> photoNames, HttpServletResponse response) {
         try {
             List<Resource> photos = photoService.getPhotos(photoNames);

@@ -4,6 +4,7 @@ import avto.accord.App.Domain.Models.Article.Article;
 import avto.accord.App.Domain.Models.Article.ArticleRequest;
 import avto.accord.App.Domain.Models.Product.ProductRequestPayload;
 import avto.accord.App.Domain.Services.ArticleService.ArticleService;
+import avto.accord.App.Infrastructure.Annotations.PublicEndpoint.PublicEndpoint;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,11 +35,13 @@ public class ArticleController {
     private ObjectMapper objectMapper;
 
     @GetMapping
+    @PublicEndpoint
     public List<Article> getAllArticles() {
         return articleService.getAllArticles();
     }
 
     @GetMapping("/{id}")
+    @PublicEndpoint
     public ResponseEntity<Article> getArticleById(@PathVariable int id) {
         return articleService.getArticleById(id)
                 .map(ResponseEntity::ok)
@@ -45,6 +49,7 @@ public class ArticleController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<Article> createArticle(
             @Parameter(description = "Article request payload", required = true, schema = @Schema(implementation = ArticleRequest.class))
             @RequestPart("articleRequestPayload") String articleRequestPayloadJson,
@@ -60,6 +65,7 @@ public class ArticleController {
         }
     }
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<Article> updateArticle(
             @PathVariable int id,
             @Parameter(description = "Article request payload", schema = @Schema(implementation = ArticleRequest.class))
@@ -77,6 +83,7 @@ public class ArticleController {
     }
 
     @DeleteMapping("/{id}")
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<Void> deleteArticle(@PathVariable int id) {
         articleService.deleteArticle(id);
         return ResponseEntity.noContent().build();

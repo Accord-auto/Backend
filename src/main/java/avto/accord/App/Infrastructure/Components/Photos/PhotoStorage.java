@@ -11,4 +11,5 @@ public interface PhotoStorage {
     void savePhoto(MultipartFile file, String fileName);
     Resource loadPhoto(String filename);
     Stream<Path> loadAllPhotos();
+    void deletePhoto(String filename);
 }

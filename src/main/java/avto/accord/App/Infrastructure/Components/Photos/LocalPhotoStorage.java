@@ -63,4 +63,17 @@ public class LocalPhotoStorage implements PhotoStorage {
             throw new RuntimeException("Could not load the files!");
         }
     }
+    @Override
+    public void deletePhoto(String filename) {
+        try {
+            Path file = root.resolve(filename);
+            if (Files.exists(file)) {
+                Files.delete(file);
+            } else {
+                throw new RuntimeException("File not found: " + filename);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Could not delete the file: " + filename, e);
+        }
+    }
 }

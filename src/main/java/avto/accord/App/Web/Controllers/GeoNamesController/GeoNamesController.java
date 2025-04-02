@@ -2,6 +2,7 @@ package avto.accord.App.Web.Controllers.GeoNamesController;
 
 import avto.accord.App.Domain.Models.GeoNamesResponse.GeoNamesResponse;
 import avto.accord.App.Domain.Services.GeoNamesService.GeoNamesService;
+import avto.accord.App.Infrastructure.Annotations.PublicEndpoint.PublicEndpoint;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +18,7 @@ public class GeoNamesController {
     }
 
     @GetMapping()
+    @PublicEndpoint
     public GeoNamesResponse getRussianRegions(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int maxRows) {
@@ -25,6 +27,7 @@ public class GeoNamesController {
     }
 
     @GetMapping("/{regionId}/cities")
+    @PublicEndpoint
     public GeoNamesResponse getCitiesByRegion(
             @PathVariable String regionId,
             @RequestParam(defaultValue = "0") int page,

@@ -141,6 +141,12 @@ public class ProductFacade implements IProductFacade {
 
         return additionalPhotoPaths;
     }
+
+    @Override
+    public void deletePhotos(List<String> photos) {
+        photoUtils.deletePhotos(photos);
+    }
+
     private Product mapToProduct(ProductRequest productRequest) {
         Product product = new Product();
         product.setName(productRequest.getName());

@@ -164,7 +164,22 @@ public class ProductService implements IProductService {
     public boolean deleteProduct(int id) {
         Optional<Product> productOptional = _productRepository.findById(id);
         if (productOptional.isPresent()) {
-            _productRepository.delete(productOptional.get());
+            Product product = productOptional.get();
+
+            // Удаление фотографий, связанных с товаром
+            List<String> photosToDelete = new ArrayList<>();
+            if (product.getMainPhotoUrl() != null) {
+                photosToDelete.add(product.getMainPhotoUrl());
+            }
+            if (product.getAdditionalPhotos() != null && !product.getAdditionalPhotos().isEmpty()) {
+                photosToDelete.addAll(product.getAdditionalPhotos());
+            }
+
+            if (!photosToDelete.isEmpty()) {
+                _productFacade.deletePhotos(photosToDelete);
+            }
+
+            _productRepository.delete(product);
             return true;
         }
         return false;

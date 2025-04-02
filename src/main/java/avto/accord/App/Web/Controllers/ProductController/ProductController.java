@@ -8,6 +8,7 @@ import avto.accord.App.Domain.Models.Product.ProductRequestPayload;
 import avto.accord.App.Domain.Models.Product.ProductResponse;
 import avto.accord.App.Domain.Models.Product.ProductSort;
 import avto.accord.App.Domain.Services.ProductRequestService.ProductRequestService;
+import avto.accord.App.Infrastructure.Annotations.PublicEndpoint.PublicEndpoint;
 import avto.accord.App.Infrastructure.Exception.ErrorResponse;
 import avto.accord.App.Infrastructure.Exception.ProductNotFoundException;
 import avto.accord.App.Infrastructure.Exception.ResourceNotFoundException;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,6 +38,7 @@ public class ProductController {
     private final ProductRequestService productRequestService;
 
     @GetMapping("/filter")
+    @PublicEndpoint
     public ResponseEntity<CustomPage<Product>> getFilteredProducts(
             @RequestParam(required = false) List<Integer> categoryIds,
             @RequestParam(required = false) List<String> brands,
@@ -63,6 +66,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.filterProducts(filter, offset, limit, sort));
     }
     @GetMapping
+    @PublicEndpoint
     public CustomPage<ProductResponse> getAllProducts(
             @RequestParam(value = "offset") int offset,
             @RequestParam(value = "limit") int limit,
@@ -72,23 +76,27 @@ public class ProductController {
     }
 
     @GetMapping("/specialOffer")
+    @PublicEndpoint
     public List<Product> getBySpecialOffers() {
         return productService.getSpecialOffer();
     }
 
     @GetMapping("/article")
+    @PublicEndpoint
     public Product getByArticle(@RequestParam String article) {
         return productService.findByArticle(article)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found by article"));
     }
 
     @GetMapping("/customerArticle")
+    @PublicEndpoint
     public Product getByCustomerArticle(@RequestParam String customerArticle) {
         return productService.findByCustomerArticle(customerArticle)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found by customer article"));
     }
 
     @GetMapping("/{id}")
+    @PublicEndpoint
     public ResponseEntity<?> getProduct(@PathVariable int id) {
         try {
             ProductResponse productResponse = productService.getProductById(id);
@@ -106,6 +114,7 @@ public class ProductController {
 
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<?> createProduct(
             @RequestPart("mainPhoto") MultipartFile mainPhoto,
             @RequestPart("additionalPhotos") List<MultipartFile> additionalPhotos,
@@ -129,6 +138,7 @@ public class ProductController {
 
 
     @PutMapping("/{id}/price")
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<Product> updateProductPrice(@PathVariable int id, @RequestBody int price) {
         Product updatedProduct = productService.updatePrice(id, price);
         if (updatedProduct != null) {
@@ -139,6 +149,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}/discount")
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<Product> updateProductDiscount(@PathVariable int id, @RequestBody int discount) {
         Product updatedProduct = productService.updateDiscount(id, discount);
         if (updatedProduct != null) {
@@ -149,6 +160,7 @@ public class ProductController {
     }
 
     @PutMapping(value = "/{id}/count", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<Product> updateProductCount(@PathVariable int id, @RequestBody int newCount) {
         Product updatedProduct = productService.updateCount(id, newCount);
         if (updatedProduct != null) {
@@ -159,6 +171,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<Void> deleteProduct(@PathVariable int id) {
         boolean deleted = productService.deleteProduct(id);
         if (deleted) {
@@ -169,6 +182,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}/customerArticle")
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<Product> updateCustomerArticle(@PathVariable int id, @RequestBody String customerArticle) {
         Product updatedProduct = productService.updateCustomerArticle(id, customerArticle);
         if (updatedProduct != null) {
@@ -179,6 +193,7 @@ public class ProductController {
     }
 
     @PutMapping(value = "/{id}/toggle-special-offer")
+    @Secured("ROLE_ADMIN")
     public ResponseEntity<?> toggleProductSpecialOffer(@PathVariable int id) {
         try {
             productService.toggleSpecialOffer(id);
