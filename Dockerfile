@@ -1,4 +1,4 @@
-FROM bellsoft/liberica-openjdk-debian:latest AS builder
+FROM bellsoft/liberica-openjdk-debian:23.0.1 AS builder
 WORKDIR /application
 COPY . .
 RUN --mount=type=cache,target=/root/.gradle  chmod +x gradlew && ./gradlew clean build -x test

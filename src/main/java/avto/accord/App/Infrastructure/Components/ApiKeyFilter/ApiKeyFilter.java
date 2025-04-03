@@ -27,7 +27,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
 
         // Исключаем Swagger UI и API документацию из проверки API-ключа
-        if (path.startsWith("/swagger-ui/") || path.startsWith("/v3/api-docs")) {
+        if (path.startsWith("/swagger-ui/") || path.startsWith("/v3/api-docs") || path.startsWith("/v3-docs")) {
             filterChain.doFilter(request, response); // Пропускаем запрос без проверки API-ключа
             return;
         }

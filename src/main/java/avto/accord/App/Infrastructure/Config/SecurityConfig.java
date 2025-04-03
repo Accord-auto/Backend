@@ -39,10 +39,11 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/auth/**",
                                 "/swagger-ui/**",
+                                "/v3/api-docs/**",
                                 "/v3-docs/**",
                                 "/companies/**",
                                 "/prices/**",
-                                "/products/**", // Исправлено: добавлен начальный слэш
+                                "/products/**",
                                 "/articles/**",
                                 "/brands/**",
                                 "/categories/**",
@@ -57,8 +58,9 @@ public class SecurityConfig {
                         "/swagger-ui/**",
                         "/v3-docs/**",
                         "/companies/**",
+                        "/v3/api-docs/**",
                         "/prices/**",
-                        "/products/**", // Исправлено: добавлен начальный слэш
+                        "/products/**",
                         "/articles/**",
                         "/brands/**",
                         "/categories/**",
