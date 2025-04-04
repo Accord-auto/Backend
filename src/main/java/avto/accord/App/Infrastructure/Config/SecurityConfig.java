@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/auth/**",
+                                "/partnership/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/v3-docs/**",
@@ -57,6 +58,7 @@ public class SecurityConfig {
                         "/auth/**",
                         "/swagger-ui/**",
                         "/v3-docs/**",
+                        "/partnership/**",
                         "/companies/**",
                         "/v3/api-docs/**",
                         "/prices/**",
@@ -74,7 +76,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
+    public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
         UserDetails admin = User.withUsername(adminUsername)
                 .password(passwordEncoder.encode(adminPassword))
                 .roles("ADMIN")

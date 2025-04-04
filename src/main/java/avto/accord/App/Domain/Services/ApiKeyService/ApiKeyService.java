@@ -1,27 +1,51 @@
 package avto.accord.App.Domain.Services.ApiKeyService;
 
+import avto.accord.App.Domain.Models.ApiKey.ApiKey;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class ApiKeyService {
 
-    private final Map<String, String> apiKeyStore = new HashMap<>(); // Храним ключи и их роли
+    private ApiKey adminApiKey; // Храним единственный токен для администратора
 
-    public String generateApiKey(String role) {
-        String apiKey = UUID.randomUUID().toString();
-        apiKeyStore.put(apiKey, role); // Привязываем ключ к роли
-        return apiKey;
+    /**
+     * Генерация нового токена для администратора
+     */
+    public String generateAdminApiKey() {
+        String token = UUID.randomUUID().toString();
+        LocalDateTime expirationTime = LocalDateTime.now().plusHours(24); // Токен действителен 24 часа
+        adminApiKey = new ApiKey(token, "ADMIN", expirationTime);
+        return token;
     }
 
+    /**
+     * Валидация токена
+     */
     public boolean validateApiKey(String apiKey) {
-        return apiKeyStore.containsKey(apiKey);
+        if (adminApiKey == null || !adminApiKey.getToken().equals(apiKey)) {
+            return false;
+        }
+        return adminApiKey.getExpirationTime().isAfter(LocalDateTime.now()); // Проверка срока действия
     }
 
-    public String getRoleForApiKey(String apiKey) {
-        return apiKeyStore.get(apiKey); // Получаем роль по ключу
+    /**
+     * Получение роли по токену
+     */
+    public Optional<String> getRoleForApiKey(String apiKey) {
+        if (validateApiKey(apiKey)) {
+            return Optional.of(adminApiKey.getRole());
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Проверка существования активного токена
+     */
+    public boolean hasActiveToken() {
+        return adminApiKey != null && adminApiKey.getExpirationTime().isAfter(LocalDateTime.now());
     }
 }

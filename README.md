@@ -10,8 +10,6 @@
 - [Функции](#функции)
 - [Технологии](#технологии)
 - [Установка](#установка)
-- [Использование](#использование)
-- [Тестирование](#тестирование)
 
 ## Описание
 
@@ -29,13 +27,16 @@
 - Обновление цены товара
 - Обновление скидки на товар
 - Обновление количества товара
-
+- Переключение специальных предложений
+- Получение списка товаров по предварительной фильтрации
+- 
 ## Технологии
 
 - **Backend**: Spring Boot
 - **Database**: mysql
 - **Testing**: JUnit, Mockito
 - **Build Tool**: Gradle
+- **Containerization** Docker
 
 ## Установка
 
@@ -43,129 +44,25 @@
 
 ```bash
 git https://github.com/Accord-auto/Backend.git
-
+```
+```bash
 cd Backend
 ```
-2. Установите зависимости:
-   ```./gradlew build```
+2. запустите сборку образа:
+   ```bash 
+    docker build -t your-image-name .
+   ```
+
 3. Запустите приложение:
-   ```./gradlew bootRun```
-
-## Использование
-После запуска приложения, вы можете взаимодействовать с API через следующие эндпоинты:
-
-### Products Endpoints
-```plaintext
-    GET /products: Получить список всех товаров с пагинацией
-```
-```plaintext
-    GET /products/{id}: Получить информацию о товаре по идентификатору
-```
-***
-```json
-[
-  {
-    "id": 0,
-    "name": "string",
-    "brand": "string",
-    "count": 0,
-    "price": {
-      "id": 0,
-      "product": "string",
-      "value": 0,
-      "discount": 0
-    },
-    "countType": "string",
-    "description": "string",
-    "article": "string",
-    "category": {
-      "name": "string",
-      "products": [
-        "string"
-      ],
-      "id": 0
-    },
-    "mainPhotoUrl": "string",
-    "additionalPhotos": [
-      "string"
-    ],
-    "properties": [
-      {
-        "id": 0,
-        "product": "string",
-        "property": {
-          "name": "string",
-          "productProperties": [
-            "string"
-          ],
-          "id": 0
-        },
-        "value": "string"
-      }
-    ]
-  }
-]
-
-```
-```plaintext
-    POST /products: Создать новый товар
-```
-```plaintext
-    PUT /products/{id}/price: Обновить цену товара
-```
-```plaintext    
-    PUT /products/{id}/discount: Обновить скидку на товар
-```
-```plaintext
-    PUT /products/{id}/count: Обновить количество товара
-```
-```plaintext
-    DELETE /products/{id}: Удалить товар
-```
-### Properties Endpoints
-```plaintext
-    POST /properties: Создать новую характеристику
-```
-```plaintext    
-    DELETE /properties/{id}: Удалить характеристику по идентификатору
-```
-### Categories Endpoints
-```plaintext
-    GET /categories: Получить список всех категорий
-```
-```plaintext
-    POST /categories: Создать новую категорию
-```
-```plaintext
-    DELETE /categories/{id}: Удалить категорию по идентификатору
-```
-### Articles Endpoints
-
-```plaintext
- GET /articles: Получить список всех статей
-```
-```plaintext
-GET /articles/{id}: Получить информацию о статье по идентификатору
-```
-```plaintext
-POST /articles: Создать новую статью
-```
-```plaintext
-PUT /articles/{id}: Обновить статью по идентификатору
-```
-```plaintext
-DELETE /articles/{id}: Удалить статью по идентификатору
-```
-### Photos Endpoints
-```plaintext
-GET /photos/: Получить список всех фоторафий
-```
-```plaintext
-GET /photos/{photoname}: Получить фотографию по пути
-```
-```plaintext
-GET /photos: Получить несколько фотографий по списку путей
-```
-## Тестирование
-Для запуска тестов используйте:
-```./gradlew test```
+   ```bash
+   docker run -e SERVER_PORT=8080 
+           -e DB_URL=jdbc:localhost:3306/ 
+           -e DB_USERNAME= 
+           -e DB_PASSWORD= 
+           -e PHOTO_STORAGE_PATH=./uploads 
+           -e GEONAMES_LOGIN=login
+           -e GEONAMES_API_URL=http://api.geonames.org/searchJSON 
+           -e ADMIN_USERNAME=admin 
+           -e ADMIN_PASSWORD=password 
+           -p 8080:8080 image-name
+   ```

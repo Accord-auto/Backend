@@ -11,7 +11,7 @@ public class GeoNamesService {
     @Value("${geonames.api.url}")
     private String GEONAMES_API_URL;
 
-    @Value("${spring.datasource.username}")
+    @Value("${geonames.login}")
     private String USERNAME;
 
     private final RestTemplate restTemplate;
