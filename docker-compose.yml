@@ -4,10 +4,10 @@ services:
   frontend-client:
     build:
       context: ./front
-      dockerfile: Dockerfile.client
-    ports:
-      - "3899:80"
+      dockerfile: Dockerfile
     env_file: ./front/.env
+    ports:
+      - "3899:3899"
     networks:
       - app-network
     depends_on:
@@ -17,7 +17,7 @@ services:
       context: ./front-admin
       dockerfile: Dockerfile
     ports:
-      - "3900:80"
+      - "3900:3900"
     env_file: ./front-admin/.env
     networks:
       - app-network
@@ -33,18 +33,6 @@ services:
       - "8080:8080"
     volumes:
       - ./Backend/uploads:/uploads
-    networks:
-      - app-network
-  nginx:
-    image: nginx:latest
-    volumes:
-      - ./Backend/nginx.conf:/etc/nginx/nginx.conf
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
-      - frontend-client
-      - frontend-admin
     networks:
       - app-network
 networks:
