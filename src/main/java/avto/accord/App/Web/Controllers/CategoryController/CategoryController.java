@@ -30,7 +30,7 @@ public class CategoryController {
     }
     @PostMapping
     @Secured("ROLE_ADMIN")
-    public ResponseEntity<Category> addCategory(@RequestBody CategoryRequest request) {
+    public ResponseEntity<Category> addCategory(@RequestBody CategoryRequest request, @RequestHeader("X-API-KEY") String apiKey) {
         try{
             Category category = _categoryService.saveCategory(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(category);

@@ -55,7 +55,11 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         apiKeyService.getRoleForApiKey(apiKey).ifPresent(role -> {
             log.info("Setting role in security context: {}", role);
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(null, null, Collections.singletonList(new SimpleGrantedAuthority(role)));
+                    new UsernamePasswordAuthenticationToken(
+                            "api-user",
+                            null,
+                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
+                    );
             SecurityContextHolder.getContext().setAuthentication(authentication);
         });
 
