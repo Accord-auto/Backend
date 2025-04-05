@@ -85,7 +85,7 @@ cd Backend
     
    * Сделайте скрипт исполняемым:
    ```bash
-   chmod +x move_docker_compose.sh
+   chmod +x prepare_backend.sh
    ```
    * Запустите скрипт:
    ```bash
