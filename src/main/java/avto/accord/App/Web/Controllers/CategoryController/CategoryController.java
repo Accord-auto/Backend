@@ -31,8 +31,13 @@ public class CategoryController {
     @PostMapping
     @Secured("ROLE_ADMIN")
     public ResponseEntity<Category> addCategory(@RequestBody CategoryRequest request) {
-        Category category = _categoryService.saveCategory(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(category);
+        try{
+            Category category = _categoryService.saveCategory(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(category);
+        }catch (Exception e) {
+            log.warn(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
     @DeleteMapping("/{id}")
     @Secured("ROLE_ADMIN")
