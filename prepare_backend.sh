@@ -24,3 +24,14 @@ mkdir -p "$CURRENT_DIR/uploads"
 chmod -R 777 "$CURRENT_DIR/uploads"
 
 echo "Операция завершена успешно!"
+
+# Переходим в корневую директорию
+cd "$ROOT_DIR" || { echo "Ошибка: Не удалось перейти в корневую директорию."; exit 1; }
+
+# Запускаем docker-compose в фоновом режиме с пересборкой образов
+echo "Запуск docker-compose..."
+docker compose up -d --build
+
+# Проверяем статус контейнеров
+echo "Статус запущенных контейнеров:"
+docker ps
