@@ -17,7 +17,7 @@ public class ApiKeyService {
      */
     public String generateAdminApiKey() {
         String token = UUID.randomUUID().toString();
-        LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(15); // Токен действителен 24 часа
+        LocalDateTime expirationTime = LocalDateTime.now().plusHours(1); // Токен действителен 1 час
         adminApiKey = new ApiKey(token, "ADMIN", expirationTime);
         return token;
     }
@@ -47,5 +47,12 @@ public class ApiKeyService {
      */
     public boolean hasActiveToken() {
         return adminApiKey != null && adminApiKey.getExpirationTime().isAfter(LocalDateTime.now());
+    }
+
+    /**
+     * Отзыв токена (логаут)
+     */
+    public void invalidateToken() {
+        adminApiKey = null; // Удаляем активный токен
     }
 }
